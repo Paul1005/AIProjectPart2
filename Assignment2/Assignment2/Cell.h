@@ -12,6 +12,6 @@ public:
 
 	int col;
 	int row;
-	Cell* parent;
+	Cell parent;
 };
 

@@ -115,7 +115,15 @@ void findShortestPath() {
 			int score = currentCell.g + 1;
 
 			if (score < neighbour.g) {
-
+				neighbour.parent = currentCell;
+				neighbour.g = score;
+				neighbour.f = neighbour.g + neighbour.h;
+				for (Cell cellInOpenList : openList) {
+					if (neighbour.col == cellInOpenList.col && neighbour.row == neighbour.row) {
+						openSet.add(neigbours);
+						break;
+					}
+				}
 			}
 		}
 	}
