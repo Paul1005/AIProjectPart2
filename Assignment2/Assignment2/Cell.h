@@ -1,7 +1,17 @@
 #pragma once
+#include <limits.h>
+
 struct Cell {
-	Cell() {}
-	Cell(int col, int row) : col(col), row(row){}
+	Cell() {
+		g = INT_MAX;
+		h = INT_MAX;
+		f = INT_MAX;
+	}
+	Cell(int col, int row) : col(col), row(row){
+		g = INT_MAX;
+		h = INT_MAX;
+		f = INT_MAX;
+	}
 	Cell(const Cell& cell) {
 		g = cell.g;
 		h = cell.h;

@@ -6,6 +6,8 @@
 #include <stack> 
 #include "Cell.h"
 #include <vector>
+#include <cmath>    
+
 using namespace std;
 
 Cell grid[10][10];
@@ -75,8 +77,8 @@ void createPath() {
 	}
 }
 
-int heuristic(Cell cell, Cell endCell) {
-	int h = (cell.col - endCell.col) + (cell.row - endCell.row);
+int heuristic(Cell startCell, Cell endCell) {
+	int h = abs(startCell.col - endCell.col) + abs(startCell.row - endCell.row);
 	return h;
 }
 
@@ -84,28 +86,28 @@ void findShortestPath() {
 	grid[0][0].g = 0;
 	grid[0][0].h = heuristic(grid[0][0], grid[9][9]);
 	grid[0][0].f = grid[0][0].h + grid[0][0].g;
-	
+
 	Cell firstCell = Cell(grid[0][0]);
 	openList.push_back(firstCell);
-	
+
 	while (openList.size() > 0) {
 		Cell& currentCell = openList.at(0);
+		int iterator = 0;
 		for (int i = 1; i < openList.size(); i++)
 		{
 			if (currentCell.f > openList.at(i).f) {
-				currentCell = openList.at(i); 
+				currentCell = openList.at(i);
+				iterator = i;
 			}
 		}
 
-		cout << currentCell.col << "\n";
-		cout << currentCell.row << "\n";
 		if (currentCell.col == grid[9][9].col && currentCell.row == grid[9][9].row) {
 			createPath();
 			break;
 		}
 
-		openList.pop_back();
-		closedList.push_back(move(currentCell));
+		openList.erase(openList.begin() + iterator);
+		closedList.push_back(currentCell);
 
 		vector<Cell> neighbours;
 		int col = currentCell.col;
@@ -113,8 +115,8 @@ void findShortestPath() {
 
 		if (col > 0) {
 			Cell& cell = grid[col - 1][row];
-			neighbours.push_back(move(cell));
-		} 
+			neighbours.push_back(cell);
+		}
 		if (col < 9) {
 			Cell& cell = grid[col + 1][row];
 			neighbours.push_back(cell);
@@ -131,9 +133,10 @@ void findShortestPath() {
 		for (Cell& neighbour : neighbours)
 		{
 			bool isInClosedSet = false;
-			for (Cell& cellInClosedList: closedList) {
-				if (neighbour.col == cellInClosedList.col && neighbour.row == neighbour.row) {
+			for (Cell& cellInClosedList : closedList) {
+				if (neighbour.col == cellInClosedList.col && neighbour.row == cellInClosedList.row) {
 					isInClosedSet = true;
+					break;
 				}
 			}
 
@@ -143,11 +146,17 @@ void findShortestPath() {
 				if (score < neighbour.g) {
 					neighbour.parent = &currentCell;
 					neighbour.g = score;
+					neighbour.h = heuristic(neighbour, grid[9][9]);
 					neighbour.f = neighbour.g + neighbour.h;
+					bool isInOpenSet = false;
 					for (Cell& cellInOpenList : openList) {
-						if (neighbour.col != cellInOpenList.col && neighbour.row != cellInOpenList.row) {
-							openList.push_back(move(neighbour));
+						if (neighbour.col == cellInOpenList.col && neighbour.row == cellInOpenList.row) {
+							isInOpenSet = true;
+							break;
 						}
+					}
+					if (!isInOpenSet) {
+						openList.push_back(neighbour);
 					}
 				}
 			}
