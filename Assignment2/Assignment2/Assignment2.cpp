@@ -19,6 +19,11 @@ vector<pair<int, int>> closedList;
 
 vector<pair<int, int>> blockedCells = { {0, 1}, {2, 0} };
 
+int const startX = 0;
+int const startY = 0;
+int const endX = 9;
+int const endY = 9;
+
 void generateGrid() {
 	for (int i = 0; i < y; i++) {
 		for (int j = 0; j < x; j++) {
@@ -38,15 +43,15 @@ void generateGrid() {
 }
 
 void createStartPoint() {
-	grid[0][0].col = 0;
-	grid[0][0].row = 0;
-	grid[0][0].symbol = 'S';
+	grid[startX][startY].col = startX;
+	grid[startX][startY].row = startX;
+	grid[startX][startY].symbol = 'S';
 }
 
 void createEndPoint() {
-	grid[9][9].col = 9;
-	grid[9][9].row = 9;
-	grid[9][9].symbol = 'E';
+	grid[endX][endY].col = endX;
+	grid[endX][endY].row = endY;
+	grid[endX][endY].symbol = 'E';
 }
 
 void createArea() {
@@ -67,7 +72,7 @@ void printArea() {
 void createPath(pair<int, int> finalCell) {
 	Cell* cellPointer = grid[finalCell.first][finalCell.second].parent;
 	Cell cell = *cellPointer;
-	while (cell.col != 0 || cell.row != 0) {
+	while (cell.col != startX || cell.row != startY) {
 		grid[cell.col][cell.row].symbol = '+';
 		cellPointer = cell.parent;
 		cell = *cellPointer;
@@ -80,11 +85,11 @@ int heuristic(Cell startCell, Cell endCell) {
 }
 
 void findShortestPath() {
-	grid[0][0].g = 0;
-	grid[0][0].h = heuristic(grid[0][0], grid[9][9]);
-	grid[0][0].f = grid[0][0].h + grid[0][0].g;
+	grid[startX][startY].g = 0;
+	grid[startX][startY].h = heuristic(grid[startX][startY], grid[9][9]);
+	grid[startX][startY].f = grid[startX][startY].h + grid[startX][startY].g;
 
-	openList.push_back({ 0, 0 });
+	openList.push_back({ startX, startY });
 
 	while (openList.size() > 0) {
 		pair<int, int> currentCell = openList.at(0);
@@ -97,7 +102,7 @@ void findShortestPath() {
 			}
 		}
 
-		if (currentCell.first == grid[9][9].col && currentCell.second == grid[9][9].row) {
+		if (currentCell.first == grid[endX][endY].col && currentCell.second == grid[endX][endY].row) {
 			createPath(currentCell);
 			break;
 		}
@@ -112,13 +117,13 @@ void findShortestPath() {
 		if (col > 0) {
 			neighbours.push_back({ col - 1, row });
 		}
-		if (col < 9) {
-			neighbours.push_back({ col + 1,row });
+		if (col < x - 1) {
+			neighbours.push_back({ col + 1, row });
 		}
 		if (row > 0) {
 			neighbours.push_back({ col, row - 1 });
 		}
-		if (row < 9) {
+		if (row < y - 1) {
 			neighbours.push_back({ col, row + 1 });
 		}
 
@@ -143,7 +148,7 @@ void findShortestPath() {
 				if (score < grid[neighbour.first][neighbour.second].g) {
 					grid[neighbour.first][neighbour.second].parent = &grid[currentCell.first][currentCell.second];
 					grid[neighbour.first][neighbour.second].g = score;
-					grid[neighbour.first][neighbour.second].h = heuristic(grid[neighbour.first][neighbour.second], grid[9][9]);
+					grid[neighbour.first][neighbour.second].h = heuristic(grid[neighbour.first][neighbour.second], grid[endX][endY]);
 					grid[neighbour.first][neighbour.second].f = grid[neighbour.first][neighbour.second].g + grid[neighbour.first][neighbour.second].h;
 					bool isInOpenSet = false;
 					for (pair<int, int> cellInOpenList : openList) {
