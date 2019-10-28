@@ -7,6 +7,7 @@
 #include "Cell.h"
 #include <vector>
 #include <cmath>    
+#include <limits.h>
 
 using namespace std;
 
@@ -71,7 +72,7 @@ void printArea() {
 void createPath(pair<int, int> finalCell) {
 	Cell* cellPointer = grid[finalCell.first][finalCell.second].parent;
 	Cell cell = *cellPointer;
-	while (cell.col != 0 && cell.row != 0) {
+	while (cell.col != 0 || cell.row != 0) {
 		grid[cell.col][cell.row].symbol = '+';
 		cellPointer = cell.parent;
 		cell = *cellPointer;
@@ -137,7 +138,12 @@ void findShortestPath() {
 			}
 
 			if (!isInClosedSet) {
+				char symbol = grid[currentCell.first][currentCell.second].symbol;
+
 				int score = grid[currentCell.first][currentCell.second].g + 1;
+				if (symbol == '#') {
+					score = INT_MAX;
+				}
 
 				if (score < grid[neighbour.first][neighbour.second].g) {
 					grid[neighbour.first][neighbour.second].parent = &grid[currentCell.first][currentCell.second];
