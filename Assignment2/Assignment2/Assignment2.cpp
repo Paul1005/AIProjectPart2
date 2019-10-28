@@ -11,8 +11,8 @@
 using namespace std;
 
 Cell grid[10][10];
-vector<Cell> openList;
-vector<Cell> closedList;
+vector<pair<int, int>> openList;
+vector<pair<int, int>> closedList;
 
 pair<int, int> blockedCells[22] = { {7, 1},
 {2, 2}, {3, 2}, {4, 2}, {5, 2}, {5, 2}, {7, 2},
@@ -68,12 +68,13 @@ void printArea() {
 	}
 }
 
-void createPath() {
-	Cell cell = *grid[9][9].parent;
-	cell.parent->symbol = '+';
+void createPath(pair<int, int> finalCell) {
+	Cell* cellPointer = grid[finalCell.first][finalCell.second].parent;
+	Cell cell = *cellPointer;
 	while (cell.col != 0 && cell.row != 0) {
 		grid[cell.col][cell.row].symbol = '+';
-		cell = *cell.parent;
+		cellPointer = cell.parent;
+		cell = *cellPointer;
 	}
 }
 
@@ -87,76 +88,72 @@ void findShortestPath() {
 	grid[0][0].h = heuristic(grid[0][0], grid[9][9]);
 	grid[0][0].f = grid[0][0].h + grid[0][0].g;
 
-	Cell firstCell = Cell(grid[0][0]);
-	openList.push_back(firstCell);
+	openList.push_back({0, 0});
 
 	while (openList.size() > 0) {
-		Cell& currentCell = openList.at(0);
+		pair<int, int> currentCell = openList.at(0);
 		int iterator = 0;
 		for (int i = 1; i < openList.size(); i++)
 		{
-			if (currentCell.f > openList.at(i).f) {
+			if (grid[currentCell.first][currentCell.second].f > grid[openList.at(i).first][openList.at(i).second].f ) {
 				currentCell = openList.at(i);
 				iterator = i;
 			}
 		}
 
-		if (currentCell.col == grid[9][9].col && currentCell.row == grid[9][9].row) {
-			createPath();
+		if (currentCell.first == grid[9][9].col && currentCell.second == grid[9][9].row) {
+			createPath(currentCell);
 			break;
 		}
 
 		openList.erase(openList.begin() + iterator);
 		closedList.push_back(currentCell);
 
-		vector<Cell> neighbours;
-		int col = currentCell.col;
-		int row = currentCell.row;
+		vector<pair<int, int>> neighbours;
+		int col = currentCell.first;
+		int row = currentCell.second;
 
 		if (col > 0) {
-			Cell& cell = grid[col - 1][row];
-			neighbours.push_back(cell);
+			neighbours.push_back({col - 1, row});
 		}
 		if (col < 9) {
-			Cell& cell = grid[col + 1][row];
-			neighbours.push_back(cell);
+			neighbours.push_back({col + 1,row});
 		}
 		if (row > 0) {
-			Cell& cell = grid[col][row - 1];
-			neighbours.push_back(cell);
+			neighbours.push_back({ col, row - 1 });
 		}
 		if (row < 9) {
-			Cell& cell = grid[col][row + 1];
-			neighbours.push_back(cell);
+			neighbours.push_back({ col, row + 1 });
 		}
 
-		for (Cell& neighbour : neighbours)
+		for (pair<int, int> neighbour : neighbours)
 		{
 			bool isInClosedSet = false;
-			for (Cell& cellInClosedList : closedList) {
-				if (neighbour.col == cellInClosedList.col && neighbour.row == cellInClosedList.row) {
+			for (pair<int, int> cellInClosedList : closedList) {
+				if (neighbour.first == cellInClosedList.first && neighbour.second == cellInClosedList.second) {
 					isInClosedSet = true;
 					break;
 				}
 			}
 
 			if (!isInClosedSet) {
-				int score = currentCell.g + 1;
+				int score = grid[currentCell.first][currentCell.second].g + 1;
 
-				if (score < neighbour.g) {
-					neighbour.parent = &currentCell;
-					neighbour.g = score;
-					neighbour.h = heuristic(neighbour, grid[9][9]);
-					neighbour.f = neighbour.g + neighbour.h;
+				if (score < grid[neighbour.first][neighbour.second].g) {
+					grid[neighbour.first][neighbour.second].parent = &grid[currentCell.first][currentCell.second];
+					grid[neighbour.first][neighbour.second].g = score;
+					grid[neighbour.first][neighbour.second].h = heuristic(grid[neighbour.first][neighbour.second], grid[9][9]);
+					grid[neighbour.first][neighbour.second].f = grid[neighbour.first][neighbour.second].g + grid[neighbour.first][neighbour.second].h;
 					bool isInOpenSet = false;
-					for (Cell& cellInOpenList : openList) {
-						if (neighbour.col == cellInOpenList.col && neighbour.row == cellInOpenList.row) {
+					for (pair<int, int> cellInOpenList : openList) {
+						if (neighbour.first == cellInOpenList.first && neighbour.second == cellInOpenList.second) {
 							isInOpenSet = true;
 							break;
 						}
 					}
 					if (!isInOpenSet) {
 						openList.push_back(neighbour);
+						//cout << "test";
 					}
 				}
 			}
