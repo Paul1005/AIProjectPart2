@@ -11,25 +11,20 @@
 
 using namespace std;
 
-Cell grid[10][10];
+int const x = 10;
+int const y = 10;
+Cell grid[x][y];
 vector<pair<int, int>> openList;
 vector<pair<int, int>> closedList;
 
-pair<int, int> blockedCells[22] = { {7, 1},
-{2, 2}, {3, 2}, {4, 2}, {5, 2}, {5, 2}, {7, 2},
-{2, 2}, {3, 2}, {4, 2}, {5, 2}, {7, 3},
-{7, 4},
-{2, 5}, {3, 5}, {4, 5}, {6, 5},
-{2, 6}, {3, 6}, {4, 6},
-{7, 8},
-{2, 9} };
+vector<pair<int, int>> blockedCells = {{1, 0}};
 
 void generateGrid() {
-	for (int i = 0; i < 10; i++) {
-		for (int j = 0; j < 10; j++) {
+	for (int i = 0; i < x; i++) {
+		for (int j = 0; j < y; j++) {
 			grid[i][j].col = i;
 			grid[i][j].row = j;
-			for (int k = 0; k < 22; k++) {
+			for (int k = 0; k < blockedCells.size(); k++) {
 				if (i == blockedCells[k].first && j == blockedCells[k].second) {
 					grid[i][j].symbol = '#';
 					break;
@@ -61,8 +56,8 @@ void createArea() {
 }
 
 void printArea() {
-	for (int i = 0; i < 10; i++) {
-		for (int j = 0; j < 10; j++) {
+	for (int i = 0; i < x; i++) {
+		for (int j = 0; j < y; j++) {
 			cout << grid[i][j].symbol;
 		}
 		cout << '\n';
