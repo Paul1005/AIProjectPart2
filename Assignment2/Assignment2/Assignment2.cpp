@@ -11,18 +11,25 @@
 
 using namespace std;
 
-int const x = 8;
-int const y = 5;
+int const x = 13;
+int const y = 8;
 Cell grid[x][y];
 vector<pair<int, int>> openList;
 vector<pair<int, int>> closedList;
 
-vector<pair<int, int>> blockedCells = { {4, 1}, {4, 2}, {4, 3} };
+vector<pair<int, int>> blockedCells = {
+{4, 0}, {5, 0}, {6, 0}, {7, 0}, {8, 0}, {9, 0},
+{9, 1},
+{9, 2},
+{9, 3},
+{9, 4},
+{9, 5},
+{4, 6}, {5, 6}, {6, 6}, {7, 6}, {8, 6}, {9, 6} };
 
-int const startX = 2;
+int const startX = 0;
 int const startY = 2;
-int const endX = 7;
-int const endY = 2;
+int const endX = 12;
+int const endY = 7;
 
 void generateGrid() {
 	for (int i = 0; i < y; i++) {
@@ -44,7 +51,7 @@ void generateGrid() {
 
 void createStartPoint() {
 	grid[startX][startY].col = startX;
-	grid[startX][startY].row = startX;
+	grid[startX][startY].row = startY;
 	grid[startX][startY].symbol = 'S';
 }
 
