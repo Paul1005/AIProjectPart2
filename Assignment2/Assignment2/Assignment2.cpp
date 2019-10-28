@@ -17,20 +17,20 @@ Cell grid[x][y];
 vector<pair<int, int>> openList;
 vector<pair<int, int>> closedList;
 
-vector<pair<int, int>> blockedCells = {{1, 0}};
+vector<pair<int, int>> blockedCells = { {0, 1}, {2, 0} };
 
 void generateGrid() {
-	for (int i = 0; i < x; i++) {
-		for (int j = 0; j < y; j++) {
-			grid[i][j].col = i;
-			grid[i][j].row = j;
+	for (int i = 0; i < y; i++) {
+		for (int j = 0; j < x; j++) {
+			grid[j][i].col = j;
+			grid[j][i].row = i;
 			for (int k = 0; k < blockedCells.size(); k++) {
-				if (i == blockedCells[k].first && j == blockedCells[k].second) {
-					grid[i][j].symbol = '#';
+				if (j == blockedCells[k].first && i == blockedCells[k].second) {
+					grid[j][i].symbol = '#';
 					break;
 				}
 				else {
-					grid[i][j].symbol = ' ';
+					grid[j][i].symbol = ' ';
 				}
 			}
 		}
@@ -56,9 +56,9 @@ void createArea() {
 }
 
 void printArea() {
-	for (int i = 0; i < x; i++) {
-		for (int j = 0; j < y; j++) {
-			cout << grid[i][j].symbol;
+	for (int i = 0; i < y; i++) {
+		for (int j = 0; j < x; j++) {
+			cout << grid[j][i].symbol;
 		}
 		cout << '\n';
 	}
@@ -84,14 +84,14 @@ void findShortestPath() {
 	grid[0][0].h = heuristic(grid[0][0], grid[9][9]);
 	grid[0][0].f = grid[0][0].h + grid[0][0].g;
 
-	openList.push_back({0, 0});
+	openList.push_back({ 0, 0 });
 
 	while (openList.size() > 0) {
 		pair<int, int> currentCell = openList.at(0);
 		int iterator = 0;
 		for (int i = 1; i < openList.size(); i++)
 		{
-			if (grid[currentCell.first][currentCell.second].f > grid[openList.at(i).first][openList.at(i).second].f ) {
+			if (grid[currentCell.first][currentCell.second].f > grid[openList.at(i).first][openList.at(i).second].f) {
 				currentCell = openList.at(i);
 				iterator = i;
 			}
@@ -110,10 +110,10 @@ void findShortestPath() {
 		int row = currentCell.second;
 
 		if (col > 0) {
-			neighbours.push_back({col - 1, row});
+			neighbours.push_back({ col - 1, row });
 		}
 		if (col < 9) {
-			neighbours.push_back({col + 1,row});
+			neighbours.push_back({ col + 1,row });
 		}
 		if (row > 0) {
 			neighbours.push_back({ col, row - 1 });
