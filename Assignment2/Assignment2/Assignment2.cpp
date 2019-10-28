@@ -11,18 +11,18 @@
 
 using namespace std;
 
-int const x = 10;
-int const y = 10;
+int const x = 8;
+int const y = 5;
 Cell grid[x][y];
 vector<pair<int, int>> openList;
 vector<pair<int, int>> closedList;
 
-vector<pair<int, int>> blockedCells = { {0, 1}, {2, 0} };
+vector<pair<int, int>> blockedCells = { {4, 1}, {4, 2}, {4, 3} };
 
-int const startX = 0;
-int const startY = 0;
-int const endX = 9;
-int const endY = 9;
+int const startX = 2;
+int const startY = 2;
+int const endX = 7;
+int const endY = 2;
 
 void generateGrid() {
 	for (int i = 0; i < y; i++) {
@@ -85,8 +85,9 @@ int heuristic(Cell startCell, Cell endCell) {
 }
 
 void findShortestPath() {
+	// add starting point to the open list
 	grid[startX][startY].g = 0;
-	grid[startX][startY].h = heuristic(grid[startX][startY], grid[9][9]);
+	grid[startX][startY].h = heuristic(grid[startX][startY], grid[endX][endY]);
 	grid[startX][startY].f = grid[startX][startY].h + grid[startX][startY].g;
 
 	openList.push_back({ startX, startY });
@@ -94,7 +95,7 @@ void findShortestPath() {
 	while (openList.size() > 0) {
 		pair<int, int> currentCell = openList.at(0);
 		int iterator = 0;
-		for (int i = 1; i < openList.size(); i++)
+		for (int i = 1; i < openList.size(); i++) // see if any in open list have a lower f value
 		{
 			if (grid[currentCell.first][currentCell.second].f > grid[openList.at(i).first][openList.at(i).second].f) {
 				currentCell = openList.at(i);
@@ -102,9 +103,9 @@ void findShortestPath() {
 			}
 		}
 
-		if (currentCell.first == grid[endX][endY].col && currentCell.second == grid[endX][endY].row) {
-			createPath(currentCell);
-			break;
+		if (currentCell.first == grid[endX][endY].col && currentCell.second == grid[endX][endY].row) { // if we reach the end
+			createPath(currentCell); // draw the path
+			break; // break the while loop
 		}
 
 		openList.erase(openList.begin() + iterator);
@@ -114,6 +115,7 @@ void findShortestPath() {
 		int col = currentCell.first;
 		int row = currentCell.second;
 
+		// find all neighbours, also check to see if we're at an edge
 		if (col > 0) {
 			neighbours.push_back({ col - 1, row });
 		}
@@ -127,7 +129,7 @@ void findShortestPath() {
 			neighbours.push_back({ col, row + 1 });
 		}
 
-		for (pair<int, int> neighbour : neighbours)
+		for (pair<int, int> neighbour : neighbours) // go through each neighbour 
 		{
 			bool isInClosedSet = false;
 			for (pair<int, int> cellInClosedList : closedList) {
@@ -142,10 +144,10 @@ void findShortestPath() {
 
 				int score = grid[currentCell.first][currentCell.second].g + 1;
 				if (symbol == '#') {
-					score = INT_MAX;
+					score = INT_MAX; // set score high if square is an obstacle
 				}
 
-				if (score < grid[neighbour.first][neighbour.second].g) {
+				if (score < grid[neighbour.first][neighbour.second].g) { // if the neighbour's new score is less than the neighbour's old score, update its info
 					grid[neighbour.first][neighbour.second].parent = &grid[currentCell.first][currentCell.second];
 					grid[neighbour.first][neighbour.second].g = score;
 					grid[neighbour.first][neighbour.second].h = heuristic(grid[neighbour.first][neighbour.second], grid[endX][endY]);
