@@ -1,4 +1,4 @@
-// Assignment2.cpp : This file contains the 'main' function. Program execution begins and ends there.
+﻿// Assignment2.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
 #include <iostream>
@@ -8,6 +8,7 @@
 #include <vector>
 #include <cmath>    
 #include <limits.h>
+#include <chrono>
 #define CL_USE_DEPRECATED_OPENCL_1_2_APIS
 #include <CL/cl.h>
 
@@ -184,7 +185,11 @@ int main()
 {
 	createArea();
 
+	auto start = std::chrono::steady_clock::now();
 	findShortestPath();
+	auto finish = std::chrono::steady_clock::now();
+	long duration = std::chrono::duration_cast<std::chrono::microseconds>(finish - start).count();
 
 	printArea();
+	std::cout << "Pathfinding took " << duration << " microseconds!" << std::endl;
 }

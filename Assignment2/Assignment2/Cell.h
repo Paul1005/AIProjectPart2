@@ -34,4 +34,3 @@ struct Cell {
 	int row;
 	Cell* parent;
 };
-
