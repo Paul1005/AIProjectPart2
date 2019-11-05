@@ -3,8 +3,9 @@
 
 #include "Serial.h"
 #include <chrono>
+#include <iostream>
 
-void Serial::findShortestPath(Grid& grid) {
+/*void Serial::findShortestPath(Grid& grid) {
 
 	std::vector<std::pair<int, int> > openList;
 	std::vector<std::pair<int, int> > closedList;
@@ -89,11 +90,35 @@ void Serial::findShortestPath(Grid& grid) {
 			}
 		}
 	}
+}*/
+float** multiplyMatrices(float matrix1[2][3], float matrix2[3][2]) {
+	int const max = 3;
+	int const min = 2;
+	int const height = min;
+	int const width = min;
+	float** finalMatrix = new float* [height];
+
+	for (int h = 0; h < height; h++)
+	{
+		finalMatrix[h] = new float[width];
+	}
+
+	for (int i = 0; i < width; i++) {
+		for (int j = 0; j < height; j++) {
+			float value = 0.0f;
+			for (int k = 0; k < max; k++) {
+				value += (matrix1[i][k] * matrix2[k][j]);
+			}
+			finalMatrix[i][j] = value;
+		}
+	}
+
+	return finalMatrix;
 }
 
 long Serial::SerialDemo()
 {
-	std::vector<std::pair<int, int> > blockedCells = {
+	/*std::vector<std::pair<int, int> > blockedCells = {
 		{4, 0}, {5, 0}, {6, 0}, {7, 0}, {8, 0}, {9, 0},
 		{9, 1},
 		{9, 2},
@@ -120,5 +145,20 @@ long Serial::SerialDemo()
 	grid.createPath();
 	grid.print();
 
+	return std::chrono::duration_cast<std::chrono::microseconds>(finish - start).count();*/
+
+	float matrix1[2][3] = { {1.0f,2.0f,3.0f},{4.0f,5.0f,6.0f} };
+	float matrix2[3][2] = { {7.0f,8.0f},{9.0f,10.0f},{11.0f,12.0f} };
+
+	auto start = std::chrono::steady_clock::now();
+	float** finalMatrix = multiplyMatrices(matrix1, matrix2);
+	auto finish = std::chrono::steady_clock::now();
+
+	for (int i = 0; i < 2; i++) {
+		for (int j = 0; j < 2; j++) {
+			std::cout << finalMatrix[i][j] << ' ';
+		}
+		std::cout << std::endl;
+	}
 	return std::chrono::duration_cast<std::chrono::microseconds>(finish - start).count();
 }

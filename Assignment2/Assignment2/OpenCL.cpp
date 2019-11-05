@@ -127,7 +127,7 @@ cl_command_queue CreateCommandQueue(cl_context context, cl_device_id* device)
 			throw std::runtime_error("ERROR getting device info!");
 		}
 
-		/*
+		
 		std::cout << " type " << devType << ":";
 		if (devType & CL_DEVICE_TYPE_CPU)
 			std::cout << " CPU";
@@ -137,7 +137,7 @@ cl_command_queue CreateCommandQueue(cl_context context, cl_device_id* device)
 			std::cout << " accelerator";
 		if (devType & CL_DEVICE_TYPE_DEFAULT)
 			std::cout << " default";
-		*/
+		
 
 		// device name
 		char devName[1024];
