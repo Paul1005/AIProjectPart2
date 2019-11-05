@@ -84,7 +84,6 @@ void Serial::findShortestPath(Grid& grid) {
 					}
 					if (!isInOpenSet) {
 						openList.push_back(neighbour);
-						//cout << "test";
 					}
 				}
 			}
