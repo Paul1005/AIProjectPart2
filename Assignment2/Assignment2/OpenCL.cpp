@@ -272,7 +272,7 @@ void Cleanup(cl_context context, cl_command_queue commandQueue,	cl_program progr
 
 
 
-timerResult_t OpenCLDemo()
+long OpenCLDemo()
 {
 	array_size = ARRAY_SIZE;
 
@@ -330,18 +330,6 @@ timerResult_t OpenCLDemo()
 		b[i] = (float)(i * 2);
 	}
 
-	CTiming timer;
-	int seconds, useconds;
-	timer.Start();
-	for (int i = 0; i < array_size; i++)
-	{
-		result[i] = a[i] + b[i];
-	}
-	timer.End();
-	if (timer.Diff(seconds, useconds))
-		std::cerr << "Warning: timer returned negative difference!" << std::endl;
-	std::cout << "Serially ran in " << seconds << "." << useconds << " seconds" << std::endl << std::endl;
-
 	if (!CreateMemObjects(context, memObjects, a, b))
 	{
 		Cleanup(context, commandQueue, program, kernel, memObjects);
@@ -368,7 +356,7 @@ timerResult_t OpenCLDemo()
 	size_t globalWorkSize[1] = { array_size };
 	size_t localWorkSize[1] = { 1 };
 
-	timer.Start();
+	auto start = std::chrono::steady_clock::now();
 
 	// Queue the kernel up for execution across the array
 	errNum = clEnqueueNDRangeKernel(commandQueue, kernel, 1, NULL,
@@ -398,22 +386,19 @@ timerResult_t OpenCLDemo()
 		throw;
 	}
 
-	timer.End();
-	if (timer.Diff(seconds, useconds))
-		std::cerr << "Warning: timer returned negative difference!" << std::endl;
-	std::cout << "OpenCL ran in " << seconds << "." << useconds << " seconds" << std::endl << std::endl;
+	auto finish = std::chrono::steady_clock::now();
+	
 
 	// Output (some of) the result buffer
 	for (int i = 0; i < ((array_size > 100) ? 100 : array_size); i++)
 	{
 		std::cout << result[i] << " ";
 	}
-	std::cout << std::endl << std::endl;
-	std::cout << "Executed program succesfully." << std::endl;
+
 	Cleanup(context, commandQueue, program, kernel, memObjects);
 	delete[] b;
 	delete[] a;
 	delete[] result;
 
-	return 0;
+	return std::chrono::duration_cast<std::chrono::microseconds>(finish - start).count();
 }

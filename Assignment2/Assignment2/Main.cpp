@@ -40,12 +40,12 @@ int gettimeofday(struct timeval* tp, struct timezone* tzp)
 //	main() for HelloWorld example
 int main(int argc, char** argv)
 {
-	timerResult_t timerResult;
+	std::cout << "Serially ran in " << SerialDemo() << " microseconds" << std::endl << std::endl;
 
-	timerResult = SerialDemo();
-	std::cout << "Serially ran in " << timerResult.seconds << "." << timerResult.useconds << " seconds" << std::endl << std::endl;
+	std::cout << "OpenCL ran in " << OpenCLDemo() << " microseconds" << std::endl << std::endl;
 
-	OpenCLDemo();
+	std::cout << std::endl << std::endl;
+	std::cout << "Executed program succesfully." << std::endl;
 
 	return 0;
 }

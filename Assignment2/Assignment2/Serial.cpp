@@ -169,24 +169,15 @@ void findShortestPath() {
 	}
 }
 
-timerResult_t SerialDemo()
+long SerialDemo()
 {
 	createArea();
 
-	CTiming timer;
-	timerResult_t timerResult;
-
-	timer.Start();
+	auto start = std::chrono::steady_clock::now();
 	findShortestPath();
-	timer.End();
+	auto finish = std::chrono::steady_clock::now();
 
 	printArea();
 
-	if (timer.Diff(timerResult.seconds, timerResult.useconds))
-	{
-		std::cerr << "Warning: timer returned negative difference!" << std::endl;
-		throw;
-	}
-	
-	return timerResult;
+	return std::chrono::duration_cast<std::chrono::microseconds>(finish - start).count();
 }
