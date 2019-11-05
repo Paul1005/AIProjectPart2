@@ -20,22 +20,6 @@
 const int ARRAY_SIZE = 10;
 int array_size = 0;
 
-
-// Function to check return value of OpenCL calls and
-// output custom error message to cerr
-bool CheckOpenCLError(cl_int errNum, const char* errMsg)
-{
-	if (errNum != CL_SUCCESS)
-	{
-		std::cerr << errMsg << std::endl;
-		return false;
-	}
-	return true;
-}
-
-
-
-
 //  Create an OpenCL context on the first available platform using
 //  either a GPU or CPU depending on what is available.
 cl_context CreateContext(cl_device_type type)
@@ -46,14 +30,10 @@ cl_context CreateContext(cl_device_type type)
 	cl_platform_id platforms [2] = { nullptr };
 	cl_uint numPlatforms;
 	cl_int errNum = clGetPlatformIDs(2, platforms, &numPlatforms);
-	if (!CheckOpenCLError(errNum, "Failed to find any OpenCL platforms."))
-		return NULL;
-	if (numPlatforms <= 0)
-	{
-		std::cerr << "Failed to find any OpenCL platforms." << std::endl;
-		return NULL;
-	}
-	std::cout << std::endl << numPlatforms << " platforms in total" << std::endl;
+	if(errNum != CL_SUCCESS)
+		throw std::exception("Failed to find any OpenCL platforms.");
+
+	//std::cout << std::endl << numPlatforms << " platforms in total" << std::endl;
 
 	cl_context context = NULL;
 
@@ -66,10 +46,12 @@ cl_context CreateContext(cl_device_type type)
 
 		// Get information about the platform
 		size_t retsize;
-		errNum = clGetPlatformInfo(p, CL_PLATFORM_NAME,
-			sizeof(pname), (void*)pname, &retsize);
-		if (!CheckOpenCLError(errNum, "Could not get platform info"))
+		errNum = clGetPlatformInfo(p, CL_PLATFORM_NAME,	sizeof(pname), (void*)pname, &retsize);
+		if (errNum != CL_SUCCESS)
+		{
+			std::cerr << "Could not get platform info" << std::endl;
 			continue;
+		}
 
 		// Next, create an OpenCL context on the platform
 		cl_context_properties contextProperties[] =
@@ -79,13 +61,12 @@ cl_context CreateContext(cl_device_type type)
 			0
 		};
 
-		context = clCreateContextFromType(contextProperties, type,
-			NULL, NULL, &errNum);
-		if (CheckOpenCLError(errNum, "Failed to create an OpenCL GPU or CPU context."))
-			break;
+		context = clCreateContextFromType(contextProperties, type, NULL, NULL, &errNum);
+		if (errNum != CL_SUCCESS)
+			throw std::exception("Failed to create an OpenCL context.");
 	}
 
-	std::cout << std::endl << "Selected platform <" << pname << ">" << std::endl;
+	//std::cout << std::endl << "Selected platform <" << pname << ">" << std::endl;
 
 	return context;
 }
@@ -99,38 +80,36 @@ cl_command_queue CreateCommandQueue(cl_context context, cl_device_id* device)
 	cl_int numDevices;
 	size_t retSize;
 	cl_int errNum = clGetContextInfo(context, CL_CONTEXT_NUM_DEVICES, sizeof(numDevices), (void*)&numDevices, &retSize);
-	if (!CheckOpenCLError(errNum, "Could not get context info!"))
-		return NULL;
-	std::cout << std::endl << "There are " << numDevices << " devices." << std::endl;
+	if (errNum != CL_SUCCESS)
+		throw std::exception("Could not get context info!");
+
+	//std::cout << std::endl << "There are " << numDevices << " devices." << std::endl;
 
 
 	// Get list of devices
 	cl_device_id* deviceList;
 	deviceList = (cl_device_id*)malloc(numDevices * sizeof(cl_device_id));
 	errNum = clGetContextInfo(context, CL_CONTEXT_DEVICES, numDevices * sizeof(cl_device_id), (void*)deviceList, &retSize);
-	if (!CheckOpenCLError(errNum, "Could not get device list!"))
+	switch (errNum)
 	{
-		std::cerr << " ERROR code " << errNum;
-		switch (errNum) {
-		case CL_INVALID_CONTEXT:
-			std::cerr << " (CL_INVALID_CONTEXT)";
-			break;
-		case CL_INVALID_VALUE:
-			std::cerr << " (CL_INVALID_VALUE)";
-			break;
-		case CL_OUT_OF_RESOURCES:
-			std::cerr << " (CL_OUT_OF_RESOURCES)";
-			break;
-		case CL_OUT_OF_HOST_MEMORY:
-			std::cerr << " (CL_OUT_OF_HOST_MEMORY)";
-			break;
-		default:
-			break;
-		}
-		std::cerr << " size = " << numDevices * sizeof(cl_device_id) << ";" << retSize << std::endl;
-		return NULL;
+		//std::cerr << " size = " << numDevices * sizeof(cl_device_id) << ";" << retSize << std::endl; // Additional info, ignoring for now.
+	case CL_INVALID_CONTEXT:
+		throw std::exception("Could not get context info! ERROR code (CL_INVALID_CONTEXT)");
+		break;
+	case CL_INVALID_VALUE:
+		throw std::exception("Could not get context info! ERROR code (CL_INVALID_VALUE)");
+		break;
+	case CL_OUT_OF_RESOURCES:
+		throw std::exception("Could not get context info! ERROR code (CL_OUT_OF_RESOURCES)");
+		break;
+	case CL_OUT_OF_HOST_MEMORY:
+		throw std::exception("Could not get context info! ERROR code (CL_OUT_OF_HOST_MEMORY)");
+		break;
+	case CL_SUCCESS:
+		break;
+	default:
+		break;
 	}
-
 
 	// Get device information for each device
 	cl_device_type devType;
@@ -142,11 +121,13 @@ cl_command_queue CreateCommandQueue(cl_context context, cl_device_id* device)
 
 		// device type
 		errNum = clGetDeviceInfo(deviceList[i], CL_DEVICE_TYPE, sizeof(cl_device_type), (void*)&devType, &retSize);
-		if (!CheckOpenCLError(errNum, "ERROR getting device info!"))
+		if (errNum != CL_SUCCESS)
 		{
 			free(deviceList);
-			return NULL;
+			throw std::exception("ERROR getting device info!");
 		}
+
+		/*
 		std::cout << " type " << devType << ":";
 		if (devType & CL_DEVICE_TYPE_CPU)
 			std::cout << " CPU";
@@ -156,16 +137,17 @@ cl_command_queue CreateCommandQueue(cl_context context, cl_device_id* device)
 			std::cout << " accelerator";
 		if (devType & CL_DEVICE_TYPE_DEFAULT)
 			std::cout << " default";
+		*/
 
 		// device name
 		char devName[1024];
 		errNum = clGetDeviceInfo(deviceList[i], CL_DEVICE_NAME, 1024, (void*)devName, &retSize);
-		if (!CheckOpenCLError(errNum, "ERROR getting device name!"))
+		if (errNum != CL_SUCCESS)
 		{
 			free(deviceList);
-			return NULL;
+			throw std::exception("ERROR getting device name!");
 		}
-		std::cout << " name=<" << devName << ">" << std::endl;
+		//std::cout << " name=<" << devName << ">" << std::endl;
 
 	}
 	std::cout << std::endl;

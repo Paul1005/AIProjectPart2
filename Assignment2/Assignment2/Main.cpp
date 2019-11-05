@@ -38,7 +38,7 @@ int main(int argc, char** argv)
 	try
 	{
 		std::cout << "Running algorithm on OpenCL CPU+GPU..." << std::endl;
-		std::cout << "OpenCL ran in " << OpenCLDemo(CL_DEVICE_TYPE_ALL) << " microseconds" << std::endl << std::endl;
+		std::cout << "OpenCL ran in " << OpenCLDemo(CL_DEVICE_TYPE_CPU|CL_DEVICE_TYPE_GPU) << " microseconds" << std::endl << std::endl;
 	}
 	catch (std::exception ex)
 	{

@@ -10,7 +10,6 @@
 
 long OpenCLDemo(cl_device_type type);
 
-bool CheckOpenCLError(cl_int errNum, const char* errMsg);
 cl_context CreateContext(cl_device_type type);
 cl_command_queue CreateCommandQueue(cl_context context, cl_device_id* device);
 cl_program CreateProgram(cl_context context, cl_device_id device, const char* fileName);
