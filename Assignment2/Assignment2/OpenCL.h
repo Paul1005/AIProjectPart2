@@ -8,7 +8,7 @@
 #include <CL/cl.h>
 #endif
 
-int OpenCLDemo();
+timerResult_t OpenCLDemo();
 
 bool CheckOpenCLError(cl_int errNum, const char* errMsg);
 cl_context CreateContext();

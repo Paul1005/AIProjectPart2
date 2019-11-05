@@ -272,7 +272,7 @@ void Cleanup(cl_context context, cl_command_queue commandQueue,	cl_program progr
 
 
 
-int OpenCLDemo()
+timerResult_t OpenCLDemo()
 {
 	array_size = ARRAY_SIZE;
 
@@ -289,7 +289,7 @@ int OpenCLDemo()
 	if (context == NULL)
 	{
 		std::cerr << "Failed to create OpenCL context." << std::endl;
-		return 1;
+		throw;
 	}
 
 	// Create a command-queue on the first device available
@@ -298,7 +298,7 @@ int OpenCLDemo()
 	if (commandQueue == NULL)
 	{
 		Cleanup(context, commandQueue, program, kernel, memObjects);
-		return 1;
+		throw;
 	}
 
 	// Create OpenCL program from HelloWorld.cl kernel source
@@ -306,7 +306,7 @@ int OpenCLDemo()
 	if (program == NULL)
 	{
 		Cleanup(context, commandQueue, program, kernel, memObjects);
-		return 1;
+		throw;
 	}
 
 	// Create OpenCL kernel
@@ -315,7 +315,7 @@ int OpenCLDemo()
 	{
 		std::cerr << "Failed to create kernel" << std::endl;
 		Cleanup(context, commandQueue, program, kernel, memObjects);
-		return 1;
+		throw;
 	}
 
 	// Create memory objects that will be used as arguments to
@@ -348,7 +348,7 @@ int OpenCLDemo()
 		delete[] b;
 		delete[] a;
 		delete[] result;
-		return 1;
+		throw;
 	}
 
 	// Set the kernel arguments (result, a, b)
@@ -362,7 +362,7 @@ int OpenCLDemo()
 		delete[] b;
 		delete[] a;
 		delete[] result;
-		return 1;
+		throw;
 	}
 
 	size_t globalWorkSize[1] = { array_size };
@@ -381,7 +381,7 @@ int OpenCLDemo()
 		delete[] b;
 		delete[] a;
 		delete[] result;
-		return 1;
+		throw;
 	}
 
 	// Read the output buffer back to the Host
@@ -395,7 +395,7 @@ int OpenCLDemo()
 		delete[] b;
 		delete[] a;
 		delete[] result;
-		return 1;
+		throw;
 	}
 
 	timer.End();

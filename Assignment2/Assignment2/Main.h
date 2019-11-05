@@ -28,6 +28,12 @@ using namespace std;
 extern const int ARRAY_SIZE;
 extern int array_size;
 
+struct timerResult_t
+{
+	int seconds;
+	int useconds;
+};
+
 
 // Helper class for timing calculations
 class CTiming

@@ -169,12 +169,12 @@ void findShortestPath() {
 	}
 }
 
-int SerialDemo()
+timerResult_t SerialDemo()
 {
 	createArea();
 
 	CTiming timer;
-	int seconds, useconds;
+	timerResult_t timerResult;
 
 	timer.Start();
 	findShortestPath();
@@ -182,9 +182,11 @@ int SerialDemo()
 
 	printArea();
 
-	if (timer.Diff(seconds, useconds))
+	if (timer.Diff(timerResult.seconds, timerResult.useconds))
+	{
 		std::cerr << "Warning: timer returned negative difference!" << std::endl;
-	std::cout << "Serially ran in " << seconds << "." << useconds << " seconds" << std::endl << std::endl;
-
-	return 0;
+		throw;
+	}
+	
+	return timerResult;
 }
