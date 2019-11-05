@@ -299,8 +299,7 @@ long OpenCLDemo(cl_device_type type)
 	context = CreateContext(type);
 	if (context == NULL)
 	{
-		std::cerr << "Failed to create OpenCL context." << std::endl;
-		throw;
+		throw std::exception("Failed to create OpenCL context.");
 	}
 
 	// Create a command-queue on the first device available
@@ -309,7 +308,7 @@ long OpenCLDemo(cl_device_type type)
 	if (commandQueue == NULL)
 	{
 		Cleanup(context, commandQueue, program, kernel, memObjects);
-		throw;
+		throw std::exception("Failed to create OpenCL command queue.");
 	}
 
 	// Create OpenCL program from HelloWorld.cl kernel source
@@ -317,7 +316,7 @@ long OpenCLDemo(cl_device_type type)
 	if (program == NULL)
 	{
 		Cleanup(context, commandQueue, program, kernel, memObjects);
-		throw;
+		throw std::exception("Failed to create OpenCL program.");
 	}
 
 	// Create OpenCL kernel
@@ -326,7 +325,7 @@ long OpenCLDemo(cl_device_type type)
 	{
 		std::cerr << "Failed to create kernel" << std::endl;
 		Cleanup(context, commandQueue, program, kernel, memObjects);
-		throw;
+		throw std::exception("Failed to create OpenCL kernel.");
 	}
 
 	// Create memory objects that will be used as arguments to
@@ -347,7 +346,7 @@ long OpenCLDemo(cl_device_type type)
 		delete[] b;
 		delete[] a;
 		delete[] result;
-		throw;
+		throw std::exception("Failed to create OpenCL memory objects.");
 	}
 
 	// Set the kernel arguments (result, a, b)
@@ -356,12 +355,11 @@ long OpenCLDemo(cl_device_type type)
 	errNum |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &memObjects[2]);
 	if (errNum != CL_SUCCESS)
 	{
-		std::cerr << "Error setting kernel arguments." << std::endl;
 		Cleanup(context, commandQueue, program, kernel, memObjects);
 		delete[] b;
 		delete[] a;
 		delete[] result;
-		throw;
+		throw std::exception("Error setting kernel arguments.");
 	}
 
 	size_t globalWorkSize[1] = { array_size };
@@ -370,31 +368,25 @@ long OpenCLDemo(cl_device_type type)
 	auto start = std::chrono::steady_clock::now();
 
 	// Queue the kernel up for execution across the array
-	errNum = clEnqueueNDRangeKernel(commandQueue, kernel, 1, NULL,
-		globalWorkSize, localWorkSize,
-		0, NULL, NULL);
+	errNum = clEnqueueNDRangeKernel(commandQueue, kernel, 1, NULL, globalWorkSize, localWorkSize, 0, NULL, NULL);
 	if (errNum != CL_SUCCESS)
 	{
-		std::cerr << "Error queuing kernel for execution." << std::endl;
 		Cleanup(context, commandQueue, program, kernel, memObjects);
 		delete[] b;
 		delete[] a;
 		delete[] result;
-		throw;
+		throw std::exception("Error queuing kernel for execution.");
 	}
 
 	// Read the output buffer back to the Host
-	errNum = clEnqueueReadBuffer(commandQueue, memObjects[2], CL_TRUE,
-		0, array_size * sizeof(float), result,
-		0, NULL, NULL);
+	errNum = clEnqueueReadBuffer(commandQueue, memObjects[2], CL_TRUE, 0, array_size * sizeof(float), result, 0, NULL, NULL);
 	if (errNum != CL_SUCCESS)
 	{
-		std::cerr << "Error reading result buffer." << std::endl;
 		Cleanup(context, commandQueue, program, kernel, memObjects);
 		delete[] b;
 		delete[] a;
 		delete[] result;
-		throw;
+		throw std::exception("Error reading result buffer.");
 	}
 
 	auto finish = std::chrono::steady_clock::now();
