@@ -293,8 +293,8 @@ long OpenCLDemo(cl_device_type type)
 		throw std::exception("Failed to create OpenCL command queue.");
 	}
 
-	// Create OpenCL program from HelloWorld.cl kernel source
-	program = CreateProgram(context, device, "HelloWorld.cl");
+	// Create OpenCL program from algorithm.cl kernel source
+	program = CreateProgram(context, device, "algorithm.cl");
 	if (program == NULL)
 	{
 		Cleanup(context, commandQueue, program, kernel, memObjects);
@@ -302,7 +302,7 @@ long OpenCLDemo(cl_device_type type)
 	}
 
 	// Create OpenCL kernel
-	kernel = clCreateKernel(program, "hello_kernel", NULL);
+	kernel = clCreateKernel(program, "algorithm_kernel", NULL);
 	if (kernel == NULL)
 	{
 		std::cerr << "Failed to create kernel" << std::endl;
