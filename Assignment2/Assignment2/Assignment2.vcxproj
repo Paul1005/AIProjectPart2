@@ -164,6 +164,8 @@
   <ItemGroup>
     <ClInclude Include="Main.h" />
     <ClInclude Include="Cell.h" />
+    <ClInclude Include="OpenCL.h" />
+    <ClInclude Include="Serial.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

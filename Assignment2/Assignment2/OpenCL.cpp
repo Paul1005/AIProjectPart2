@@ -10,6 +10,13 @@
 
 
 #include "Main.h"
+#include "OpenCL.h"
+
+
+//  Constants
+const int ARRAY_SIZE = 10;
+int array_size = 0;
+
 
 // Function to check return value of OpenCL calls and
 // output custom error message to cerr
@@ -265,7 +272,6 @@ void Cleanup(cl_context context, cl_command_queue commandQueue,	cl_program progr
 
 
 
-/*
 int OpenCLDemo()
 {
 	array_size = ARRAY_SIZE;
@@ -397,5 +403,3 @@ int OpenCLDemo()
 
 	return 0;
 }
-
-*/
