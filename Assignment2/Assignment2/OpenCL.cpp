@@ -9,8 +9,11 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 
-#include "Main.h"
 #include "OpenCL.h"
+#include <chrono>
+#include <fstream>
+#include <sstream>
+#include <iostream>
 
 
 //  Constants

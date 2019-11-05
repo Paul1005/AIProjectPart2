@@ -1,6 +1,6 @@
-#include "Main.h"
 #include "Serial.h"
 #include "OpenCL.h"
+#include <iostream>
 
 //	main() for HelloWorld example
 int main(int argc, char** argv)

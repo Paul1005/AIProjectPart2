@@ -32,9 +32,6 @@
     <ClInclude Include="Cell.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Main.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="OpenCL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
