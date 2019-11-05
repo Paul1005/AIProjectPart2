@@ -8,7 +8,7 @@
 #include <CL/cl.h>
 #endif
 
-long OpenCLDemo();
+long OpenCLDemo(cl_device_type type);
 
 bool CheckOpenCLError(cl_int errNum, const char* errMsg);
 cl_context CreateContext();
