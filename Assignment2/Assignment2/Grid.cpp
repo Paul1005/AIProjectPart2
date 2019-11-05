@@ -44,7 +44,6 @@ Grid::Grid(int sizeX, int sizeY, int startX, int startY, int endX, int endY, std
 
 Grid::~Grid()
 {
-	std::cout << "oops";
 	for (int i = 0; i < sizeX; ++i)
 	{
 		delete[] grid[i];
