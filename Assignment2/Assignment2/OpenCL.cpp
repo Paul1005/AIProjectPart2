@@ -31,7 +31,7 @@ cl_context CreateContext(cl_device_type type)
 	cl_uint numPlatforms;
 	cl_int errNum = clGetPlatformIDs(2, platforms, &numPlatforms);
 	if(errNum != CL_SUCCESS)
-		throw std::exception("Failed to find any OpenCL platforms.");
+		throw std::runtime_error("Failed to find any OpenCL platforms.");
 
 	//std::cout << std::endl << numPlatforms << " platforms in total" << std::endl;
 
@@ -63,7 +63,7 @@ cl_context CreateContext(cl_device_type type)
 
 		context = clCreateContextFromType(contextProperties, type, NULL, NULL, &errNum);
 		if (errNum != CL_SUCCESS)
-			throw std::exception("Failed to create an OpenCL context.");
+			throw std::runtime_error("Failed to create an OpenCL context.");
 	}
 
 	//std::cout << std::endl << "Selected platform <" << pname << ">" << std::endl;
@@ -81,7 +81,7 @@ cl_command_queue CreateCommandQueue(cl_context context, cl_device_id* device)
 	size_t retSize;
 	cl_int errNum = clGetContextInfo(context, CL_CONTEXT_NUM_DEVICES, sizeof(numDevices), (void*)&numDevices, &retSize);
 	if (errNum != CL_SUCCESS)
-		throw std::exception("Could not get context info!");
+		throw std::runtime_error("Could not get context info!");
 
 	//std::cout << std::endl << "There are " << numDevices << " devices." << std::endl;
 
@@ -94,16 +94,16 @@ cl_command_queue CreateCommandQueue(cl_context context, cl_device_id* device)
 	{
 		//std::cerr << " size = " << numDevices * sizeof(cl_device_id) << ";" << retSize << std::endl; // Additional info, ignoring for now.
 	case CL_INVALID_CONTEXT:
-		throw std::exception("Could not get context info! ERROR code (CL_INVALID_CONTEXT)");
+		throw std::runtime_error("Could not get context info! ERROR code (CL_INVALID_CONTEXT)");
 		break;
 	case CL_INVALID_VALUE:
-		throw std::exception("Could not get context info! ERROR code (CL_INVALID_VALUE)");
+		throw std::runtime_error("Could not get context info! ERROR code (CL_INVALID_VALUE)");
 		break;
 	case CL_OUT_OF_RESOURCES:
-		throw std::exception("Could not get context info! ERROR code (CL_OUT_OF_RESOURCES)");
+		throw std::runtime_error("Could not get context info! ERROR code (CL_OUT_OF_RESOURCES)");
 		break;
 	case CL_OUT_OF_HOST_MEMORY:
-		throw std::exception("Could not get context info! ERROR code (CL_OUT_OF_HOST_MEMORY)");
+		throw std::runtime_error("Could not get context info! ERROR code (CL_OUT_OF_HOST_MEMORY)");
 		break;
 	case CL_SUCCESS:
 		break;
@@ -124,7 +124,7 @@ cl_command_queue CreateCommandQueue(cl_context context, cl_device_id* device)
 		if (errNum != CL_SUCCESS)
 		{
 			free(deviceList);
-			throw std::exception("ERROR getting device info!");
+			throw std::runtime_error("ERROR getting device info!");
 		}
 
 		/*
@@ -145,7 +145,7 @@ cl_command_queue CreateCommandQueue(cl_context context, cl_device_id* device)
 		if (errNum != CL_SUCCESS)
 		{
 			free(deviceList);
-			throw std::exception("ERROR getting device name!");
+			throw std::runtime_error("ERROR getting device name!");
 		}
 		//std::cout << " name=<" << devName << ">" << std::endl;
 
@@ -281,7 +281,7 @@ long OpenCLDemo(cl_device_type type)
 	context = CreateContext(type);
 	if (context == NULL)
 	{
-		throw std::exception("Failed to create OpenCL context.");
+		throw std::runtime_error("Failed to create OpenCL context.");
 	}
 
 	// Create a command-queue on the first device available
@@ -290,7 +290,7 @@ long OpenCLDemo(cl_device_type type)
 	if (commandQueue == NULL)
 	{
 		Cleanup(context, commandQueue, program, kernel, memObjects);
-		throw std::exception("Failed to create OpenCL command queue.");
+		throw std::runtime_error("Failed to create OpenCL command queue.");
 	}
 
 	// Create OpenCL program from algorithm.cl kernel source
@@ -298,7 +298,7 @@ long OpenCLDemo(cl_device_type type)
 	if (program == NULL)
 	{
 		Cleanup(context, commandQueue, program, kernel, memObjects);
-		throw std::exception("Failed to create OpenCL program.");
+		throw std::runtime_error("Failed to create OpenCL program.");
 	}
 
 	// Create OpenCL kernel
@@ -307,7 +307,7 @@ long OpenCLDemo(cl_device_type type)
 	{
 		std::cerr << "Failed to create kernel" << std::endl;
 		Cleanup(context, commandQueue, program, kernel, memObjects);
-		throw std::exception("Failed to create OpenCL kernel.");
+		throw std::runtime_error("Failed to create OpenCL kernel.");
 	}
 
 	// Create memory objects that will be used as arguments to
@@ -328,7 +328,7 @@ long OpenCLDemo(cl_device_type type)
 		delete[] b;
 		delete[] a;
 		delete[] result;
-		throw std::exception("Failed to create OpenCL memory objects.");
+		throw std::runtime_error("Failed to create OpenCL memory objects.");
 	}
 
 	// Set the kernel arguments (result, a, b)
@@ -341,7 +341,7 @@ long OpenCLDemo(cl_device_type type)
 		delete[] b;
 		delete[] a;
 		delete[] result;
-		throw std::exception("Error setting kernel arguments.");
+		throw std::runtime_error("Error setting kernel arguments.");
 	}
 
 	size_t globalWorkSize[1] = { array_size };
@@ -357,7 +357,7 @@ long OpenCLDemo(cl_device_type type)
 		delete[] b;
 		delete[] a;
 		delete[] result;
-		throw std::exception("Error queuing kernel for execution.");
+		throw std::runtime_error("Error queuing kernel for execution.");
 	}
 
 	// Read the output buffer back to the Host
@@ -368,7 +368,7 @@ long OpenCLDemo(cl_device_type type)
 		delete[] b;
 		delete[] a;
 		delete[] result;
-		throw std::exception("Error reading result buffer.");
+		throw std::runtime_error("Error reading result buffer.");
 	}
 
 	auto finish = std::chrono::steady_clock::now();
