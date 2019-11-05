@@ -6,8 +6,8 @@
 
 void Serial::findShortestPath(Grid& grid) {
 
-	std::vector<std::pair<int, int>> openList;
-	std::vector<std::pair<int, int>> closedList;
+	std::vector<std::pair<int, int> > openList;
+	std::vector<std::pair<int, int> > closedList;
 
 	// add starting point to the open list
 	grid[grid.startX][grid.startY].g = 0;
@@ -34,7 +34,7 @@ void Serial::findShortestPath(Grid& grid) {
 		openList.erase(openList.begin() + iterator);
 		closedList.push_back(currentCell);
 
-		std::vector<std::pair<int, int>> neighbours;
+		std::vector<std::pair<int, int> > neighbours;
 		int col = currentCell.first;
 		int row = currentCell.second;
 
@@ -94,7 +94,7 @@ void Serial::findShortestPath(Grid& grid) {
 
 long Serial::SerialDemo()
 {
-	std::vector<std::pair<int, int>> blockedCells = {
+	std::vector<std::pair<int, int> > blockedCells = {
 		{4, 0}, {5, 0}, {6, 0}, {7, 0}, {8, 0}, {9, 0},
 		{9, 1},
 		{9, 2},

@@ -5,7 +5,7 @@
 
 struct Grid
 {
-	Grid(int sizeX, int sizeY, int startX, int startY, int endX, int endY, std::vector<std::pair<int, int>> blockedCells);
+	Grid(int sizeX, int sizeY, int startX, int startY, int endX, int endY, std::vector<std::pair<int, int> > blockedCells);
 	~Grid();
 	Cell** grid;
 	const int sizeX;
