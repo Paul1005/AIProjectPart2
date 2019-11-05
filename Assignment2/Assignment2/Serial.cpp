@@ -1,14 +1,14 @@
 ﻿// Assignment2.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
-#include "Main.h"
 #include "Serial.h"
 #include "Grid.h"
+#include <chrono>
 
 void Serial::findShortestPath(Grid& grid) {
 
-	vector<pair<int, int>> openList;
-	vector<pair<int, int>> closedList;
+	std::vector<std::pair<int, int>> openList;
+	std::vector<std::pair<int, int>> closedList;
 
 	// add starting point to the open list
 	grid[grid.startX][grid.startY].g = 0;
@@ -18,7 +18,7 @@ void Serial::findShortestPath(Grid& grid) {
 	openList.push_back({ grid.startX, grid.startY });
 
 	while (openList.size() > 0) {
-		pair<int, int> currentCell = openList.at(0);
+		std::pair<int, int> currentCell = openList.at(0);
 		int iterator = 0;
 		for (int i = 1; i < openList.size(); i++) // see if any in open list have a lower f value
 		{
@@ -35,7 +35,7 @@ void Serial::findShortestPath(Grid& grid) {
 		openList.erase(openList.begin() + iterator);
 		closedList.push_back(currentCell);
 
-		vector<pair<int, int>> neighbours;
+		std::vector<std::pair<int, int>> neighbours;
 		int col = currentCell.first;
 		int row = currentCell.second;
 
@@ -53,10 +53,10 @@ void Serial::findShortestPath(Grid& grid) {
 			neighbours.push_back({ col, row + 1 });
 		}
 
-		for (pair<int, int> neighbour : neighbours) // go through each neighbour 
+		for (std::pair<int, int> neighbour : neighbours) // go through each neighbour 
 		{
 			bool isInClosedSet = false;
-			for (pair<int, int> cellInClosedList : closedList) {
+			for (std::pair<int, int> cellInClosedList : closedList) {
 				if (neighbour.first == cellInClosedList.first && neighbour.second == cellInClosedList.second) {
 					isInClosedSet = true;
 					break;
@@ -77,7 +77,7 @@ void Serial::findShortestPath(Grid& grid) {
 					grid[neighbour.first][neighbour.second].h = grid.heuristic(neighbour.first, neighbour.second);
 					grid[neighbour.first][neighbour.second].f = grid[neighbour.first][neighbour.second].g + grid[neighbour.first][neighbour.second].h;
 					bool isInOpenSet = false;
-					for (pair<int, int> cellInOpenList : openList) {
+					for (std::pair<int, int> cellInOpenList : openList) {
 						if (neighbour.first == cellInOpenList.first && neighbour.second == cellInOpenList.second) {
 							isInOpenSet = true;
 							break;
@@ -95,7 +95,7 @@ void Serial::findShortestPath(Grid& grid) {
 
 long Serial::SerialDemo()
 {
-	vector<pair<int, int>> blockedCells = {
+	std::vector<std::pair<int, int>> blockedCells = {
 		{4, 0}, {5, 0}, {6, 0}, {7, 0}, {8, 0}, {9, 0},
 		{9, 1},
 		{9, 2},
