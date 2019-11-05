@@ -344,7 +344,7 @@ long OpenCLDemo(cl_device_type type)
 		throw std::runtime_error("Error setting kernel arguments.");
 	}
 
-	size_t globalWorkSize[1] = { array_size };
+	size_t globalWorkSize[1] = { static_cast<size_t>(array_size) };
 	size_t localWorkSize[1] = { 1 };
 
 	auto start = std::chrono::steady_clock::now();
