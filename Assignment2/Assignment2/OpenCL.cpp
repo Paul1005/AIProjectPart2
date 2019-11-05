@@ -330,10 +330,17 @@ int OpenCLDemo()
 		b[i] = (float)(i * 2);
 	}
 
+	CTiming timer;
+	int seconds, useconds;
+	timer.Start();
 	for (int i = 0; i < array_size; i++)
 	{
 		result[i] = a[i] + b[i];
 	}
+	timer.End();
+	if (timer.Diff(seconds, useconds))
+		std::cerr << "Warning: timer returned negative difference!" << std::endl;
+	std::cout << "Serially ran in " << seconds << "." << useconds << " seconds" << std::endl << std::endl;
 
 	if (!CreateMemObjects(context, memObjects, a, b))
 	{
@@ -360,6 +367,8 @@ int OpenCLDemo()
 
 	size_t globalWorkSize[1] = { array_size };
 	size_t localWorkSize[1] = { 1 };
+
+	timer.Start();
 
 	// Queue the kernel up for execution across the array
 	errNum = clEnqueueNDRangeKernel(commandQueue, kernel, 1, NULL,
@@ -388,6 +397,11 @@ int OpenCLDemo()
 		delete[] result;
 		return 1;
 	}
+
+	timer.End();
+	if (timer.Diff(seconds, useconds))
+		std::cerr << "Warning: timer returned negative difference!" << std::endl;
+	std::cout << "OpenCL ran in " << seconds << "." << useconds << " seconds" << std::endl << std::endl;
 
 	// Output (some of) the result buffer
 	for (int i = 0; i < ((array_size > 100) ? 100 : array_size); i++)
