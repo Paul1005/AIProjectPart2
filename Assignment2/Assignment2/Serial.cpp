@@ -1,20 +1,7 @@
 ﻿// Assignment2.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
-#include <iostream>
-#include <stdlib.h>
-#include <stack> 
-#include "Cell.h"
-#include <vector>
-#include <cmath>    
-#include <limits.h>
-#include <chrono>
-#define CL_USE_DEPRECATED_OPENCL_1_2_APIS
-#include <CL/cl.h>
-
-#include <Windows.h>
-
-using namespace std;
+#include "Main.h"
 
 int const x = 13;
 int const y = 8;
@@ -181,7 +168,7 @@ void findShortestPath() {
 	}
 }
 
-int main()
+int SerialDemo()
 {
 	createArea();
 
@@ -192,4 +179,6 @@ int main()
 
 	printArea();
 	std::cout << "Pathfinding took " << duration << " microseconds!" << std::endl;
+
+	return 0;
 }

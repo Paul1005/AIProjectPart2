@@ -157,9 +157,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Assignment2.cpp" />
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Serial.cpp" />
+    <ClCompile Include="OpenCL.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Main.h" />
     <ClInclude Include="Cell.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
