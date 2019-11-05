@@ -5,7 +5,6 @@
 
 namespace Serial
 {
-	void createPath(Grid grid, std::pair<int, int> finalCell);
-	void findShortestPath(Grid grid);
+	void findShortestPath(Grid& grid);
 	long SerialDemo();
 };

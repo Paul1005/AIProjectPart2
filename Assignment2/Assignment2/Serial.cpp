@@ -5,17 +5,7 @@
 #include "Serial.h"
 #include "Grid.h"
 
-void Serial::createPath(Grid grid, pair<int, int> finalCell) {
-	Cell* cellPointer = grid[finalCell.first][finalCell.second].parent;
-	Cell cell = *cellPointer;
-	while (cell.col != grid.startX || cell.row != grid.startY) {
-		grid[cell.col][cell.row].symbol = '+';
-		cellPointer = cell.parent;
-		cell = *cellPointer;
-	}
-}
-
-void Serial::findShortestPath(Grid grid) {
+void Serial::findShortestPath(Grid& grid) {
 
 	vector<pair<int, int>> openList;
 	vector<pair<int, int>> closedList;
@@ -39,7 +29,6 @@ void Serial::findShortestPath(Grid grid) {
 		}
 
 		if (currentCell.first == grid[grid.endX][grid.endY].col && currentCell.second == grid[grid.endX][grid.endY].row) { // if we reach the end
-			createPath(grid, currentCell); // draw the path
 			break; // break the while loop
 		}
 
@@ -130,6 +119,7 @@ long Serial::SerialDemo()
 	findShortestPath(grid);
 	auto finish = std::chrono::steady_clock::now();
 
+	grid.createPath();
 	grid.print();
 
 	return std::chrono::duration_cast<std::chrono::microseconds>(finish - start).count();

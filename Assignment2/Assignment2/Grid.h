@@ -6,6 +6,7 @@
 struct Grid
 {
 	Grid(int sizeX, int sizeY, int startX, int startY, int endX, int endY, std::vector<std::pair<int, int>> blockedCells);
+	~Grid();
 	Cell** grid;
 	const int sizeX;
 	const int sizeY;
@@ -16,4 +17,5 @@ struct Grid
 	Cell* operator [] (int x) const { return grid[x]; }
 	void print();
 	int heuristic(int x, int y);
+	void createPath();
 };

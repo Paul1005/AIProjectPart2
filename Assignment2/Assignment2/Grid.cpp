@@ -42,6 +42,17 @@ Grid::Grid(int sizeX, int sizeY, int startX, int startY, int endX, int endY, std
 	grid[endX][endY].symbol = 'E';
 }
 
+Grid::~Grid()
+{
+	std::cout << "oops";
+	for (int i = 0; i < sizeX; ++i)
+	{
+		delete[] grid[i];
+	}
+
+	delete[] grid;
+}
+
 void Grid::print()
 {
 	for (int i = 0; i < sizeY; i++) {
@@ -55,4 +66,15 @@ void Grid::print()
 int Grid::heuristic(int x, int y)
 {
 	return abs(x - endX) + abs(y - endY);
+}
+
+void Grid::createPath()
+{
+	Cell* cellPointer = grid[endX][endY].parent;
+	Cell cell = *cellPointer;
+	while (cell.col != startX || cell.row != startY) {
+		grid[cell.col][cell.row].symbol = '+';
+		cellPointer = cell.parent;
+		cell = *cellPointer;
+	}
 }
