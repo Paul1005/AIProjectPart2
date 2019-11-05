@@ -173,13 +173,18 @@ int SerialDemo()
 {
 	createArea();
 
-	auto start = std::chrono::steady_clock::now();
+	CTiming timer;
+	int seconds, useconds;
+
+	timer.Start();
 	findShortestPath();
-	auto finish = std::chrono::steady_clock::now();
-	long duration = std::chrono::duration_cast<std::chrono::microseconds>(finish - start).count();
+	timer.End();
 
 	printArea();
-	std::cout << "Pathfinding took " << duration << " microseconds!" << std::endl;
+
+	if (timer.Diff(seconds, useconds))
+		std::cerr << "Warning: timer returned negative difference!" << std::endl;
+	std::cout << "Serially ran in " << seconds << "." << useconds << " seconds" << std::endl << std::endl;
 
 	return 0;
 }
