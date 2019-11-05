@@ -11,8 +11,6 @@
 #include <limits.h>
 #include <chrono>
 
-using namespace std;
-
 //  Constants
 extern const int ARRAY_SIZE;
 extern int array_size;

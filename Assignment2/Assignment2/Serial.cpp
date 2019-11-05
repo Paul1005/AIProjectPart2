@@ -2,7 +2,6 @@
 //
 
 #include "Serial.h"
-#include "Grid.h"
 #include <chrono>
 
 void Serial::findShortestPath(Grid& grid) {
