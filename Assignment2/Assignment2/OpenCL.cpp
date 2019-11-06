@@ -17,8 +17,20 @@
 
 
 //  Constants
-const int ARRAY_SIZE = 10;
+const int ARRAY_SIZE = 3;
 int array_size = 0;
+
+// Function to check return value of OpenCL calls and
+// output custom error message to cerr
+bool CheckOpenCLError(cl_int errNum, const char* errMsg)
+{
+	if (errNum != CL_SUCCESS)
+	{
+		std::cerr << errMsg << std::endl;
+		return false;
+	}
+	return true;
+}
 
 //  Create an OpenCL context on the first available platform using
 //  either a GPU or CPU depending on what is available.
@@ -74,7 +86,7 @@ cl_command_queue CreateCommandQueue(cl_context context, cl_device_id* device)
 	// Get number of devices
 	cl_int numDevices;
 	size_t retSize;
-	cl_int errNum = clGetContextInfo(context, CL_CONTEXT_NUM_DEVICES, sizeof(numDevices), (void*)&numDevices, &retSize);
+	cl_int errNum = clGetContextInfo(context, CL_CONTEXT_NUM_DEVICES, sizeof(numDevices), (void*)& numDevices, &retSize);
 	if (errNum != CL_SUCCESS)
 		throw std::runtime_error("Could not get context info!");
 
@@ -115,14 +127,14 @@ cl_command_queue CreateCommandQueue(cl_context context, cl_device_id* device)
 		std::cout << "   " << deviceList[i] << ": ";
 
 		// device type
-		errNum = clGetDeviceInfo(deviceList[i], CL_DEVICE_TYPE, sizeof(cl_device_type), (void*)&devType, &retSize);
+		errNum = clGetDeviceInfo(deviceList[i], CL_DEVICE_TYPE, sizeof(cl_device_type), (void*)& devType, &retSize);
 		if (errNum != CL_SUCCESS)
 		{
 			free(deviceList);
 			throw std::runtime_error("ERROR getting device info!");
 		}
 
-		
+
 		std::cout << " type " << devType << ":";
 		if (devType & CL_DEVICE_TYPE_CPU)
 			std::cout << " CPU";
@@ -132,7 +144,7 @@ cl_command_queue CreateCommandQueue(cl_context context, cl_device_id* device)
 			std::cout << " accelerator";
 		if (devType & CL_DEVICE_TYPE_DEFAULT)
 			std::cout << " default";
-		
+
 
 		// device name
 		char devName[1024];
@@ -187,7 +199,7 @@ cl_program CreateProgram(cl_context context, cl_device_id device, const char* fi
 	std::string srcStdStr = oss.str();
 	const char* srcStr = srcStdStr.c_str();
 	program = clCreateProgramWithSource(context, 1,
-		(const char**)&srcStr,
+		(const char**)& srcStr,
 		NULL, NULL);
 	if (program == NULL)
 	{
@@ -216,16 +228,20 @@ cl_program CreateProgram(cl_context context, cl_device_id device, const char* fi
 
 //  Create memory objects used as the arguments to the kernel
 //  The kernel takes three arguments: result (output), a (input), and b (input)
-bool CreateMemObjects(cl_context context, cl_mem memObjects[3],	float matrix1[2][3], float matrix2[3][2])
+bool CreateMemObjects(cl_context context, cl_mem memObjects[5], float* matrix1row1, float* matrix1row2, float* matrix2col1, float* matrix2col2)
 {
 	memObjects[0] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-		sizeof(float) * array_size, matrix1, NULL);
+		sizeof(float) * array_size, matrix1row1, NULL);
 	memObjects[1] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-		sizeof(float) * array_size, matrix2, NULL);
-	memObjects[2] = clCreateBuffer(context, CL_MEM_READ_WRITE,
-		sizeof(float) * array_size, NULL, NULL);
+		sizeof(float) * array_size, matrix1row2, NULL);
+	memObjects[2] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+		sizeof(float) * array_size, matrix2col1, NULL);
+	memObjects[3] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+		sizeof(float) * array_size, matrix2col2, NULL);
+	memObjects[4] = clCreateBuffer(context, CL_MEM_READ_WRITE,
+		sizeof(float) * 4, NULL, NULL);
 
-	if (memObjects[0] == NULL || memObjects[1] == NULL || memObjects[2] == NULL)
+	if (memObjects[0] == NULL || memObjects[1] == NULL || memObjects[2] == NULL || memObjects[3] == NULL || memObjects[4] == NULL)
 	{
 		std::cerr << "Error creating memory objects." << std::endl;
 		return false;
@@ -237,9 +253,9 @@ bool CreateMemObjects(cl_context context, cl_mem memObjects[3],	float matrix1[2]
 
 
 //  Cleanup any created OpenCL resources
-void Cleanup(cl_context context, cl_command_queue commandQueue,	cl_program program, cl_kernel kernel, cl_mem memObjects[3])
+void Cleanup(cl_context context, cl_command_queue commandQueue, cl_program program, cl_kernel kernel, cl_mem memObjects[5])
 {
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		if (memObjects[i] != 0)
 			clReleaseMemObject(memObjects[i]);
@@ -269,7 +285,7 @@ long OpenCLDemo(cl_device_type type)
 	cl_program program = 0;
 	cl_device_id device = 0;
 	cl_kernel kernel = 0;
-	cl_mem memObjects[3] = { 0, 0, 0 };
+	cl_mem memObjects[5] = { 0, 0, 0, 0, 0};
 	cl_int errNum;
 
 	// Create an OpenCL context on first available GPU
@@ -308,20 +324,35 @@ long OpenCLDemo(cl_device_type type)
 	// Create memory objects that will be used as arguments to
 	// kernel.  First create host memory arrays that will be
 	// used to store the arguments to the kernel
-	float matrix1[2][3] = { {1.0f,2.0f,3.0f},{4.0f,5.0f,6.0f} };
-	float matrix2[3][2] = { {7.0f,8.0f},{9.0f,10.0f},{11.0f,12.0f} };
-	float** finalMatrix = new float* [2];
+	float* matrix1row1 = new float[array_size];
+	matrix1row1[0] = 1.0f;
+	matrix1row1[1] = 2.0f;
+	matrix1row1[2] = 3.0f;
+	float* matrix1row2 = new float[array_size];
+	matrix1row2[0] = 4.0f;
+	matrix1row2[1] = 5.0f;
+	matrix1row2[2] = 6.0f;
+	float* matrix2col1 = new float[array_size];
+	matrix2col1[0] = 7.0f;
+	matrix2col1[1] = 9.0f;
+	matrix2col1[2] = 11.0f;
+	float* matrix2col2 = new float[array_size];
+	matrix2col2[0] = 8.0f;
+	matrix2col2[1] = 10.0f;
+	matrix2col2[2] = 12.0f;
+	float* finalMatrix = new float[4];
+	finalMatrix[0] = 0.0f;
+	finalMatrix[1] = 0.0f;
+	finalMatrix[2] = 0.0f;
+	finalMatrix[3] = 0.0f;
 
-	for (int h = 0; h < 2; h++)
-	{
-		finalMatrix[h] = new float[2];
-	}
-
-	if (!CreateMemObjects(context, memObjects, matrix1, matrix2))
+	if (!CreateMemObjects(context, memObjects, matrix1row1, matrix1row2, matrix2col1, matrix2col2))
 	{
 		Cleanup(context, commandQueue, program, kernel, memObjects);
-		delete[] matrix1;
-		delete[] matrix2;
+		delete[] matrix1row1;
+		delete[] matrix1row2;
+		delete[] matrix2col1;
+		delete[] matrix2col2;
 		delete[] finalMatrix;
 		throw std::runtime_error("Failed to create OpenCL memory objects.");
 	}
@@ -330,12 +361,16 @@ long OpenCLDemo(cl_device_type type)
 	errNum = clSetKernelArg(kernel, 0, sizeof(cl_mem), &memObjects[0]);
 	errNum |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &memObjects[1]);
 	errNum |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &memObjects[2]);
+	errNum |= clSetKernelArg(kernel, 3, sizeof(cl_mem), &memObjects[3]);
+	errNum |= clSetKernelArg(kernel, 4, sizeof(cl_mem), &memObjects[4]);
 
 	if (errNum != CL_SUCCESS)
 	{
 		Cleanup(context, commandQueue, program, kernel, memObjects);
-		delete[] matrix1;
-		delete[] matrix2;
+		delete[] matrix1row1;
+		delete[] matrix1row2;
+		delete[] matrix2col1;
+		delete[] matrix2col2;
 		delete[] finalMatrix;
 		throw std::runtime_error("Error setting kernel arguments.");
 	}
@@ -350,37 +385,42 @@ long OpenCLDemo(cl_device_type type)
 	if (errNum != CL_SUCCESS)
 	{
 		Cleanup(context, commandQueue, program, kernel, memObjects);
-		delete[] matrix1;
-		delete[] matrix2;
+		delete[] matrix1row1;
+		delete[] matrix1row2;
+		delete[] matrix2col1;
+		delete[] matrix2col2;
 		delete[] finalMatrix;
 		throw std::runtime_error("Error queuing kernel for execution.");
 	}
 
 	// Read the output buffer back to the Host
-	errNum = clEnqueueReadBuffer(commandQueue, memObjects[2], CL_TRUE, 0, array_size * sizeof(float), finalMatrix, 0, NULL, NULL);
+	errNum = clEnqueueReadBuffer(commandQueue, memObjects[4], CL_TRUE, 0, 4 * sizeof(float), finalMatrix, 0, NULL, NULL);
 	if (errNum != CL_SUCCESS)
 	{
 		Cleanup(context, commandQueue, program, kernel, memObjects);
-		delete[] matrix1;
-		delete[] matrix2;
+		delete[] matrix1row1;
+		delete[] matrix1row2;
+		delete[] matrix2col1;
+		delete[] matrix2col2;
 		delete[] finalMatrix;
 		throw std::runtime_error("Error reading result buffer.");
 	}
 
 	auto finish = std::chrono::steady_clock::now();
-	
 
 	// Output (some of) the result buffer
-	for (int i = 0; i < 2; i++) {
-		for (int j = 0; j < 2; j++) {
-			std::cout << finalMatrix[i][j] << ' ';
+	for (int i = 0; i < 4; i++) {
+		std::cout << finalMatrix[i] << ' ';
+		if (i == 1) {
+			std::cout << std::endl;
 		}
-		std::cout << std::endl;
 	}
 
 	Cleanup(context, commandQueue, program, kernel, memObjects);
-	delete[] matrix1;
-	delete[] matrix2;
+	delete[] matrix1row1;
+	delete[] matrix1row2;
+	delete[] matrix2col1;
+	delete[] matrix2col2;
 	delete[] finalMatrix;
 
 	return std::chrono::duration_cast<std::chrono::microseconds>(finish - start).count();
