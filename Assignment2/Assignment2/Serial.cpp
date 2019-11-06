@@ -1,4 +1,4 @@
-﻿// Assignment2.cpp : This file contains the 'main' function. Program execution begins and ends there.
+// Assignment2.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
 #include "Serial.h"
@@ -163,7 +163,7 @@ long Serial::SerialDemo()
 	grid.createPath();
 	grid.print();
 
-	return std::chrono::duration_cast<std::chrono::microseconds>(finish - start).count();*/
+	return std::chrono::duration_cast<std::chrono::nanoseconds>(finish - start).count();*/
 
 	/*float matrix1[2][3] = { {1.0f,2.0f,3.0f},{4.0f,5.0f,6.0f} };
 	float matrix2[3][2] = { {7.0f,8.0f},{9.0f,10.0f},{11.0f,12.0f} };
@@ -178,7 +178,7 @@ long Serial::SerialDemo()
 		}
 		std::cout << std::endl;
 	}
-	return std::chrono::duration_cast<std::chrono::microseconds>(finish - start).count();*/
+	return std::chrono::duration_cast<std::chrono::nanoseconds>(finish - start).count();*/
 
 	float* matrix1row1 = new float[3];
 	matrix1row1[0] = 1.0f;
@@ -213,5 +213,5 @@ long Serial::SerialDemo()
 			std::cout << std::endl;
 		}
 	}
-	return std::chrono::duration_cast<std::chrono::microseconds>(finish - start).count();
+	return std::chrono::duration_cast<std::chrono::nanoseconds>(finish - start).count();
 }

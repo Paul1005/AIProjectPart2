@@ -423,5 +423,5 @@ long OpenCLDemo(cl_device_type type)
 	delete[] matrix2col2;
 	delete[] finalMatrix;
 
-	return std::chrono::duration_cast<std::chrono::microseconds>(finish - start).count();
+	return std::chrono::duration_cast<std::chrono::nanoseconds>(finish - start).count();
 }
