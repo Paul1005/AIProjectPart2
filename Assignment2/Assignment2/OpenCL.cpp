@@ -22,51 +22,46 @@ int array_size = 0;
 
 //  Create an OpenCL context on the first available platform using
 //  either a GPU or CPU depending on what is available.
-cl_context CreateContext(cl_device_type type)
+cl_context CreateContext()
 {
 	// First, select an OpenCL platform to run on.  For this example, we
 	// simply choose the first available platform.  Normally, you would
 	// query for all available platforms and select the most appropriate one.
-	cl_platform_id platforms [2] = { nullptr };
+	cl_platform_id firstPlatformId;
 	cl_uint numPlatforms;
-	cl_int errNum = clGetPlatformIDs(2, platforms, &numPlatforms);
-	if(errNum != CL_SUCCESS)
-		throw std::runtime_error("Failed to find any OpenCL platforms.");
-
-	//std::cout << std::endl << numPlatforms << " platforms in total" << std::endl;
-
-	cl_context context = NULL;
-
-	char pname[1024];
-
-	// iterate over all platforms and find a valid device
-	for (cl_platform_id p : platforms)
+	cl_int errNum = clGetPlatformIDs(1, &firstPlatformId, &numPlatforms);
+	if (!CheckOpenCLError(errNum, "Failed to find any OpenCL platforms."))
+		return NULL;
+	if (numPlatforms <= 0)
 	{
-		if (p == nullptr) break;
-
-		// Get information about the platform
-		size_t retsize;
-		errNum = clGetPlatformInfo(p, CL_PLATFORM_NAME,	sizeof(pname), (void*)pname, &retsize);
-		if (errNum != CL_SUCCESS)
-		{
-			std::cerr << "Could not get platform info" << std::endl;
-			continue;
-		}
-
-		// Next, create an OpenCL context on the platform
-		cl_context_properties contextProperties[] =
-		{
-			CL_CONTEXT_PLATFORM,
-			(cl_context_properties)p,
-			0
-		};
-
-		context = clCreateContextFromType(contextProperties, type, NULL, NULL, &errNum);
-		if (errNum != CL_SUCCESS)
-			throw std::runtime_error("Failed to create an OpenCL context.");
+		std::cerr << "Failed to find any OpenCL platforms." << std::endl;
+		return NULL;
 	}
+	std::cout << std::endl << numPlatforms << " platforms in total" << std::endl;
 
-	//std::cout << std::endl << "Selected platform <" << pname << ">" << std::endl;
+
+	// Get information about the platform
+	char pname[1024];
+	size_t retsize;
+	errNum = clGetPlatformInfo(firstPlatformId, CL_PLATFORM_NAME,
+		sizeof(pname), (void*)pname, &retsize);
+	if (!CheckOpenCLError(errNum, "Could not get platform info"))
+		return NULL;
+	std::cout << std::endl << "Selected platform <" << pname << ">" << std::endl;
+
+
+	// Next, create an OpenCL context on the platform
+	cl_context_properties contextProperties[] =
+	{
+		CL_CONTEXT_PLATFORM,
+		(cl_context_properties)firstPlatformId,
+		0
+	};
+	cl_context context = NULL;
+	context = clCreateContextFromType(contextProperties, CL_DEVICE_TYPE_ALL,
+		NULL, NULL, &errNum);
+	if (!CheckOpenCLError(errNum, "Failed to create an OpenCL GPU or CPU context."))
+		return NULL;
 
 	return context;
 }
@@ -278,7 +273,7 @@ long OpenCLDemo(cl_device_type type)
 	cl_int errNum;
 
 	// Create an OpenCL context on first available GPU
-	context = CreateContext(type);
+	context = CreateContext();
 	if (context == NULL)
 	{
 		throw std::runtime_error("Failed to create OpenCL context.");
