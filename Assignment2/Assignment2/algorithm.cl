@@ -1,18 +1,11 @@
 
-__kernel void algorithm_kernel(__global const float *a,
-						__global const float *b,
-						__global float *result)
+__kernel void algorithm_kernel(__global float** finalMatrix,
+						__global const float** matrix1,
+						__global const float** matrix2)
 {
+	int const height = 2;
+	int const width = 2;
 	int const max = 3;
-	int const min = 2;
-	int const height = min;
-	int const width = min;
-	float** finalMatrix = new float*[height];
-
-	for (int h = 0; h < height; h++)
-	{
-		finalMatrix[h] = new float[width];
-	}
 
 	for (int i = 0; i < width; i++) {
 		for (int j = 0; j < height; j++) {

@@ -96,6 +96,7 @@ float** multiplyMatrices(float matrix1[2][3], float matrix2[3][2]) {
 	int const min = 2;
 	int const height = min;
 	int const width = min;
+
 	float** finalMatrix = new float* [height];
 
 	for (int h = 0; h < height; h++)
