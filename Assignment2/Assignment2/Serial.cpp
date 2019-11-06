@@ -1,4 +1,4 @@
-﻿// Assignment2.cpp : This file contains the 'main' function. Program execution begins and ends there.
+// Assignment2.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
 #include "Serial.h"
@@ -91,7 +91,7 @@
 		}
 	}
 }*/
-float** multiplyMatrices(float matrix1[2][3], float matrix2[3][2]) {
+/*float** multiplyMatrices(float matrix1[2][3], float matrix2[3][2]) {
 	int const max = 3;
 	int const min = 2;
 	int const height = min;
@@ -115,6 +115,23 @@ float** multiplyMatrices(float matrix1[2][3], float matrix2[3][2]) {
 	}
 
 	return finalMatrix;
+}*/
+
+void multiplyMatrices( const float* matrix1row1,
+	 const float* matrix1row2,
+	 const float* matrix2col1,
+	 const float* matrix2col2,
+	 float* finalMatrix) {
+
+	for (int i = 0; i < 3; i++) {
+		finalMatrix[0] += (matrix1row1[i] * matrix2col1[i]);
+
+		finalMatrix[1] += (matrix1row1[i] * matrix2col2[i]);
+
+		finalMatrix[2] += (matrix1row2[i] * matrix2col1[i]);
+
+		finalMatrix[3] += (matrix1row2[i] * matrix2col2[i]);
+	}
 }
 
 long Serial::SerialDemo()
@@ -146,9 +163,9 @@ long Serial::SerialDemo()
 	grid.createPath();
 	grid.print();
 
-	return std::chrono::duration_cast<std::chrono::microseconds>(finish - start).count();*/
+	return std::chrono::duration_cast<std::chrono::nanoseconds>(finish - start).count();*/
 
-	float matrix1[2][3] = { {1.0f,2.0f,3.0f},{4.0f,5.0f,6.0f} };
+	/*float matrix1[2][3] = { {1.0f,2.0f,3.0f},{4.0f,5.0f,6.0f} };
 	float matrix2[3][2] = { {7.0f,8.0f},{9.0f,10.0f},{11.0f,12.0f} };
 
 	auto start = std::chrono::steady_clock::now();
@@ -161,5 +178,40 @@ long Serial::SerialDemo()
 		}
 		std::cout << std::endl;
 	}
-	return std::chrono::duration_cast<std::chrono::microseconds>(finish - start).count();
+	return std::chrono::duration_cast<std::chrono::nanoseconds>(finish - start).count();*/
+
+	float* matrix1row1 = new float[3];
+	matrix1row1[0] = 1.0f;
+	matrix1row1[1] = 2.0f;
+	matrix1row1[2] = 3.0f;
+	float* matrix1row2 = new float[3];
+	matrix1row2[0] = 4.0f;
+	matrix1row2[1] = 5.0f;
+	matrix1row2[2] = 6.0f;
+	float* matrix2col1 = new float[3];
+	matrix2col1[0] = 7.0f;
+	matrix2col1[1] = 9.0f;
+	matrix2col1[2] = 11.0f;
+	float* matrix2col2 = new float[3];
+	matrix2col2[0] = 8.0f;
+	matrix2col2[1] = 10.0f;
+	matrix2col2[2] = 12.0f;
+	float* finalMatrix = new float[4];
+	finalMatrix[0] = 0.0f;
+	finalMatrix[1] = 0.0f;
+	finalMatrix[2] = 0.0f;
+	finalMatrix[3] = 0.0f;
+
+	auto start = std::chrono::steady_clock::now();
+	multiplyMatrices(matrix1row1, matrix1row2, matrix2col1, matrix2col2, finalMatrix);
+	auto finish = std::chrono::steady_clock::now();
+
+	// Output (some of) the result buffer
+	for (int i = 0; i < 4; i++) {
+		std::cout << finalMatrix[i] << ' ';
+		if (i == 1) {
+			std::cout << std::endl;
+		}
+	}
+	return std::chrono::duration_cast<std::chrono::nanoseconds>(finish - start).count();
 }
