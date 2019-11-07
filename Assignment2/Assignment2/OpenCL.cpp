@@ -106,6 +106,7 @@ cl_command_queue CreateCommandQueue(cl_context context, cl_device_id* device)
 	case CL_SUCCESS:
 		break;
 	default:
+		throw std::runtime_error("Could not get context info! ERROR code (Not checked.)");
 		break;
 	}
 
