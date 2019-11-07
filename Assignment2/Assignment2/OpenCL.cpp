@@ -15,6 +15,7 @@
 #include <sstream>
 #include <iostream>
 #include <algorithm>    // std::min
+#include <cmath>
 
 //  Create an OpenCL context on the first available platform using
 //  either a GPU or CPU depending on what is available.
@@ -334,7 +335,7 @@ long OpenCLDemo(cl_device_type type)
 	const int numFinalMatrixRows = std::min(numMatrix1Rows, numMatrix2Rows);
 	const int numFinalMatrixCols = std::min(numMatrix1Cols, numMatrix2Cols);
 	const int finalMatrixSize = numFinalMatrixRows * numFinalMatrixCols;
-	const int finalMatrixLength = sqrt(finalMatrixSize);
+	const int finalMatrixLength = std::sqrt(finalMatrixSize);
 
 	float* finalMatrix = new float[finalMatrixSize];
 	for (int i = 0; i < finalMatrixSize; i++) {

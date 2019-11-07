@@ -5,6 +5,7 @@
 #include <chrono>
 #include <iostream>
 #include <algorithm> 
+#include <cmath>
 
 /*void Serial::findShortestPath(Grid& grid) {
 
@@ -171,7 +172,7 @@ long Serial::SerialDemo()
 	const int numFinalMatrixRows = std::min(numMatrix1Rows, numMatrix2Rows);
 	const int numFinalMatrixCols = std::min(numMatrix1Cols, numMatrix2Cols);
 	const int finalMatrixSize = numFinalMatrixRows * numFinalMatrixCols;
-	const int finalMatrixLength = sqrt(finalMatrixSize);
+	const int finalMatrixLength = std::sqrt(finalMatrixSize);
 
 	float** finalMatrix = new float* [numFinalMatrixRows];
 	for (int i = 0; i < numFinalMatrixRows; i++)
