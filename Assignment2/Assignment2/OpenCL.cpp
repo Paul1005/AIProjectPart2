@@ -449,7 +449,7 @@ long OpenCLDemo(cl_device_type type)
 	errNum = clEnqueueNDRangeKernel(commandQueue, kernel, 2, NULL, globalWorkSize, localWorkSize, 0, NULL, NULL);
 	if (errNum != CL_SUCCESS)
 	{
-		std::cout << "test";
+		std::cout << "errNum: " << errNum << std::endl;
 		Cleanup(context, commandQueue, program, kernel, memObjects);
 		delete[] matrix1;
 		delete[] matrix2;
