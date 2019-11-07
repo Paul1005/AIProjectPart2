@@ -352,13 +352,84 @@ long OpenCLDemo(cl_device_type type)
 	}
 
 	errNum = clSetKernelArg(kernel, 0, sizeof(cl_int), &numMatrix1Cols);
+	if (errNum != CL_SUCCESS)
+	{
+		Cleanup(context, commandQueue, program, kernel, memObjects);
+		delete[] matrix1;
+		delete[] matrix2;
+		delete[] finalMatrix;
+		throw std::runtime_error("Error setting kernel arguments.");
+	}
+
 	errNum = clSetKernelArg(kernel, 1, sizeof(cl_int), &numMatrix1Rows);
+	if (errNum != CL_SUCCESS)
+	{
+		Cleanup(context, commandQueue, program, kernel, memObjects);
+		delete[] matrix1;
+		delete[] matrix2;
+		delete[] finalMatrix;
+		throw std::runtime_error("Error setting kernel arguments.");
+	}
+
 	errNum = clSetKernelArg(kernel, 2, sizeof(cl_mem), &memObjects[0]);
+	if (errNum != CL_SUCCESS)
+	{
+		Cleanup(context, commandQueue, program, kernel, memObjects);
+		delete[] matrix1;
+		delete[] matrix2;
+		delete[] finalMatrix;
+		throw std::runtime_error("Error setting kernel arguments.");
+	}
+
 	errNum = clSetKernelArg(kernel, 3, sizeof(cl_int), &numMatrix2Cols);
+	if (errNum != CL_SUCCESS)
+	{
+		Cleanup(context, commandQueue, program, kernel, memObjects);
+		delete[] matrix1;
+		delete[] matrix2;
+		delete[] finalMatrix;
+		throw std::runtime_error("Error setting kernel arguments.");
+	}
+
 	errNum = clSetKernelArg(kernel, 4, sizeof(cl_int), &numMatrix2Rows);
+	if (errNum != CL_SUCCESS)
+	{
+		Cleanup(context, commandQueue, program, kernel, memObjects);
+		delete[] matrix1;
+		delete[] matrix2;
+		delete[] finalMatrix;
+		throw std::runtime_error("Error setting kernel arguments.");
+	}
+
 	errNum = clSetKernelArg(kernel, 5, sizeof(cl_mem), &memObjects[1]);
+	if (errNum != CL_SUCCESS)
+	{
+		Cleanup(context, commandQueue, program, kernel, memObjects);
+		delete[] matrix1;
+		delete[] matrix2;
+		delete[] finalMatrix;
+		throw std::runtime_error("Error setting kernel arguments.");
+	}
+
 	errNum = clSetKernelArg(kernel, 6, sizeof(cl_int), &finalMatrixLength);
+	if (errNum != CL_SUCCESS)
+	{
+		Cleanup(context, commandQueue, program, kernel, memObjects);
+		delete[] matrix1;
+		delete[] matrix2;
+		delete[] finalMatrix;
+		throw std::runtime_error("Error setting kernel arguments.");
+	}
+
 	errNum = clSetKernelArg(kernel, 7, sizeof(cl_mem), &memObjects[2]);
+	if (errNum != CL_SUCCESS)
+	{
+		Cleanup(context, commandQueue, program, kernel, memObjects);
+		delete[] matrix1;
+		delete[] matrix2;
+		delete[] finalMatrix;
+		throw std::runtime_error("Error setting kernel arguments.");
+	}
 
 	if (errNum != CL_SUCCESS)
 	{
