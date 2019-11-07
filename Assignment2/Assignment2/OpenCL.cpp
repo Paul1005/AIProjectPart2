@@ -369,7 +369,7 @@ long OpenCLDemo(cl_device_type type)
 	}
 
 	size_t globalWorkSize[2] = { static_cast<size_t>(numFinalMatrixCols), static_cast<size_t>(numFinalMatrixRows) };
-	size_t localWorkSize[2] = { 2,2 };
+	size_t localWorkSize[2] = { 1,1 };
 
 	auto start = std::chrono::steady_clock::now();
 
