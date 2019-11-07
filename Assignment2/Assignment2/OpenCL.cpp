@@ -15,6 +15,7 @@
 #include <sstream>
 #include <iostream>
 #include <algorithm>    // std::min
+#include <cmath>
 
 //  Create an OpenCL context on the first available platform using
 //  either a GPU or CPU depending on what is available.
@@ -105,6 +106,7 @@ cl_command_queue CreateCommandQueue(cl_context context, cl_device_id* device)
 	case CL_SUCCESS:
 		break;
 	default:
+		throw std::runtime_error("Could not get context info! ERROR code (Not checked.)");
 		break;
 	}
 
@@ -334,7 +336,7 @@ long OpenCLDemo(cl_device_type type)
 	const int numFinalMatrixRows = std::min(numMatrix1Rows, numMatrix2Rows);
 	const int numFinalMatrixCols = std::min(numMatrix1Cols, numMatrix2Cols);
 	const int finalMatrixSize = numFinalMatrixRows * numFinalMatrixCols;
-	const int finalMatrixLength = sqrt(finalMatrixSize);
+	const int finalMatrixLength = std::sqrt(finalMatrixSize);
 
 	float* finalMatrix = new float[finalMatrixSize];
 	for (int i = 0; i < finalMatrixSize; i++) {
@@ -351,13 +353,84 @@ long OpenCLDemo(cl_device_type type)
 	}
 
 	errNum = clSetKernelArg(kernel, 0, sizeof(cl_int), &numMatrix1Cols);
-	errNum |= clSetKernelArg(kernel, 1, sizeof(cl_int), &numMatrix1Rows);
-	errNum |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &memObjects[0]);
-	errNum |= clSetKernelArg(kernel, 3, sizeof(cl_int), &numMatrix2Cols);
-	errNum |= clSetKernelArg(kernel, 4, sizeof(cl_int), &numMatrix2Rows);
-	errNum |= clSetKernelArg(kernel, 5, sizeof(cl_mem), &memObjects[1]);
-	errNum |= clSetKernelArg(kernel, 6, sizeof(cl_int), &finalMatrixLength);
-	errNum |= clSetKernelArg(kernel, 7, sizeof(cl_mem), &memObjects[2]);
+	if (errNum != CL_SUCCESS)
+	{
+		Cleanup(context, commandQueue, program, kernel, memObjects);
+		delete[] matrix1;
+		delete[] matrix2;
+		delete[] finalMatrix;
+		throw std::runtime_error("Error setting kernel arguments.");
+	}
+
+	errNum = clSetKernelArg(kernel, 1, sizeof(cl_int), &numMatrix1Rows);
+	if (errNum != CL_SUCCESS)
+	{
+		Cleanup(context, commandQueue, program, kernel, memObjects);
+		delete[] matrix1;
+		delete[] matrix2;
+		delete[] finalMatrix;
+		throw std::runtime_error("Error setting kernel arguments.");
+	}
+
+	errNum = clSetKernelArg(kernel, 2, sizeof(cl_mem), &memObjects[0]);
+	if (errNum != CL_SUCCESS)
+	{
+		Cleanup(context, commandQueue, program, kernel, memObjects);
+		delete[] matrix1;
+		delete[] matrix2;
+		delete[] finalMatrix;
+		throw std::runtime_error("Error setting kernel arguments.");
+	}
+
+	errNum = clSetKernelArg(kernel, 3, sizeof(cl_int), &numMatrix2Cols);
+	if (errNum != CL_SUCCESS)
+	{
+		Cleanup(context, commandQueue, program, kernel, memObjects);
+		delete[] matrix1;
+		delete[] matrix2;
+		delete[] finalMatrix;
+		throw std::runtime_error("Error setting kernel arguments.");
+	}
+
+	errNum = clSetKernelArg(kernel, 4, sizeof(cl_int), &numMatrix2Rows);
+	if (errNum != CL_SUCCESS)
+	{
+		Cleanup(context, commandQueue, program, kernel, memObjects);
+		delete[] matrix1;
+		delete[] matrix2;
+		delete[] finalMatrix;
+		throw std::runtime_error("Error setting kernel arguments.");
+	}
+
+	errNum = clSetKernelArg(kernel, 5, sizeof(cl_mem), &memObjects[1]);
+	if (errNum != CL_SUCCESS)
+	{
+		Cleanup(context, commandQueue, program, kernel, memObjects);
+		delete[] matrix1;
+		delete[] matrix2;
+		delete[] finalMatrix;
+		throw std::runtime_error("Error setting kernel arguments.");
+	}
+
+	errNum = clSetKernelArg(kernel, 6, sizeof(cl_int), &finalMatrixLength);
+	if (errNum != CL_SUCCESS)
+	{
+		Cleanup(context, commandQueue, program, kernel, memObjects);
+		delete[] matrix1;
+		delete[] matrix2;
+		delete[] finalMatrix;
+		throw std::runtime_error("Error setting kernel arguments.");
+	}
+
+	errNum = clSetKernelArg(kernel, 7, sizeof(cl_mem), &memObjects[2]);
+	if (errNum != CL_SUCCESS)
+	{
+		Cleanup(context, commandQueue, program, kernel, memObjects);
+		delete[] matrix1;
+		delete[] matrix2;
+		delete[] finalMatrix;
+		throw std::runtime_error("Error setting kernel arguments.");
+	}
 
 	if (errNum != CL_SUCCESS)
 	{
@@ -377,7 +450,7 @@ long OpenCLDemo(cl_device_type type)
 	errNum = clEnqueueNDRangeKernel(commandQueue, kernel, 2, NULL, globalWorkSize, localWorkSize, 0, NULL, NULL);
 	if (errNum != CL_SUCCESS)
 	{
-		std::cout << "test";
+		std::cout << "errNum: " << errNum << std::endl;
 		Cleanup(context, commandQueue, program, kernel, memObjects);
 		delete[] matrix1;
 		delete[] matrix2;
@@ -405,6 +478,7 @@ long OpenCLDemo(cl_device_type type)
 			std::cout << std::endl;
 		}
 	}
+	std::cout << std::endl;
 
 	Cleanup(context, commandQueue, program, kernel, memObjects);
 	delete[] matrix1;
