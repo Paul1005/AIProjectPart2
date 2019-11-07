@@ -352,13 +352,13 @@ long OpenCLDemo(cl_device_type type)
 	}
 
 	errNum = clSetKernelArg(kernel, 0, sizeof(cl_int), &numMatrix1Cols);
-	errNum |= clSetKernelArg(kernel, 1, sizeof(cl_int), &numMatrix1Rows);
-	errNum |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &memObjects[0]);
-	errNum |= clSetKernelArg(kernel, 3, sizeof(cl_int), &numMatrix2Cols);
-	errNum |= clSetKernelArg(kernel, 4, sizeof(cl_int), &numMatrix2Rows);
-	errNum |= clSetKernelArg(kernel, 5, sizeof(cl_mem), &memObjects[1]);
-	errNum |= clSetKernelArg(kernel, 6, sizeof(cl_int), &finalMatrixLength);
-	errNum |= clSetKernelArg(kernel, 7, sizeof(cl_mem), &memObjects[2]);
+	errNum = clSetKernelArg(kernel, 1, sizeof(cl_int), &numMatrix1Rows);
+	errNum = clSetKernelArg(kernel, 2, sizeof(cl_mem), &memObjects[0]);
+	errNum = clSetKernelArg(kernel, 3, sizeof(cl_int), &numMatrix2Cols);
+	errNum = clSetKernelArg(kernel, 4, sizeof(cl_int), &numMatrix2Rows);
+	errNum = clSetKernelArg(kernel, 5, sizeof(cl_mem), &memObjects[1]);
+	errNum = clSetKernelArg(kernel, 6, sizeof(cl_int), &finalMatrixLength);
+	errNum = clSetKernelArg(kernel, 7, sizeof(cl_mem), &memObjects[2]);
 
 	if (errNum != CL_SUCCESS)
 	{
