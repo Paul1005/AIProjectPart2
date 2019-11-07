@@ -1,17 +1,22 @@
 
-__kernel void algorithm_kernel(__global const float* matrix1row1, 
-__global const float* matrix1row2, 
-__global const float* matrix2col1, 
-__global const float* matrix2col2, 
+__kernel void algorithm_kernel(const int numMatrix1Cols, 
+const int numMatrix1Rows,
+__global const float* matrix1,
+const int numMatrix2Cols, 
+const int numMatrix2Rows,
+__global const float* matrix2,
+const int finalMatrixLength,
 __global float* finalMatrix)
 {
-    int gid = get_global_id(0);
+    int gid = (get_global_id(1) * finalMatrixLength) + get_global_id(0);
 
-	finalMatrix[0] += (matrix1row1[gid]*matrix2col1[gid]);
+	float value = 0.0f;
 
-	finalMatrix[1] += (matrix1row1[gid]*matrix2col2[gid]);
-	
-	finalMatrix[2] += (matrix1row2[gid]*matrix2col1[gid]);
+	for(int i = 0; i < numMatrix1Cols; i++){
+		int index1 = (get_global_id(1) * numMatrix1Cols) + i;
+		int index2 = (i * numMatrix2Cols) + get_global_id(0);
+		value += matrix1[index1] * matrix2[index2];
+	}
 
-	finalMatrix[3] += (matrix1row2[gid]*matrix2col2[gid]);
+	finalMatrix[gid] = value;
 }

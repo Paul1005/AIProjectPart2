@@ -10,8 +10,8 @@
 
 long OpenCLDemo(cl_device_type type);
 
-cl_context CreateContext();
+cl_context CreateContext(cl_device_type type);
 cl_command_queue CreateCommandQueue(cl_context context, cl_device_id* device);
 cl_program CreateProgram(cl_context context, cl_device_id device, const char* fileName);
-bool CreateMemObjects(cl_context context, cl_mem memObjects[3], float* a, float* b);
+bool CreateMemObjects(cl_context context, cl_mem memObjects[3], float* matrix1, float* matrix2, float* finalMatrix);
 void Cleanup(cl_context context, cl_command_queue commandQueue, cl_program program, cl_kernel kernel, cl_mem memObjects[3]);

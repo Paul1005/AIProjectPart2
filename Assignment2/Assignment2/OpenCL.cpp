@@ -14,11 +14,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
-
-
-//  Constants
-const int ARRAY_SIZE = 3;
-int array_size = 0;
+#include <algorithm>    // std::min
 
 //  Create an OpenCL context on the first available platform using
 //  either a GPU or CPU depending on what is available.
@@ -222,20 +218,19 @@ cl_program CreateProgram(cl_context context, cl_device_id device, const char* fi
 
 //  Create memory objects used as the arguments to the kernel
 //  The kernel takes three arguments: result (output), a (input), and b (input)
-bool CreateMemObjects(cl_context context, cl_mem memObjects[5], float* matrix1row1, float* matrix1row2, float* matrix2col1, float* matrix2col2)
+bool CreateMemObjects(cl_context context, cl_mem memObjects[3], float* matrix1, float* matrix2, float* finalMatrix)
 {
+	int matrix1Size = sizeof(matrix1);
+	int matrix2Size = sizeof(matrix2);
+	int finalMatrixSize = sizeof(finalMatrix);
 	memObjects[0] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-		sizeof(float) * array_size, matrix1row1, NULL);
+		sizeof(float) * matrix1Size, matrix1, NULL);
 	memObjects[1] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-		sizeof(float) * array_size, matrix1row2, NULL);
-	memObjects[2] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-		sizeof(float) * array_size, matrix2col1, NULL);
-	memObjects[3] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-		sizeof(float) * array_size, matrix2col2, NULL);
-	memObjects[4] = clCreateBuffer(context, CL_MEM_READ_WRITE,
-		sizeof(float) * 4, NULL, NULL);
+		sizeof(float) * matrix2Size, matrix2, NULL);
+	memObjects[2] = clCreateBuffer(context, CL_MEM_READ_WRITE,
+		sizeof(float) * finalMatrixSize, NULL, NULL);
 
-	if (memObjects[0] == NULL || memObjects[1] == NULL || memObjects[2] == NULL || memObjects[3] == NULL || memObjects[4] == NULL)
+	if (memObjects[0] == NULL || memObjects[1] == NULL || memObjects[2] == NULL)
 	{
 		std::cerr << "Error creating memory objects." << std::endl;
 		return false;
@@ -247,9 +242,9 @@ bool CreateMemObjects(cl_context context, cl_mem memObjects[5], float* matrix1ro
 
 
 //  Cleanup any created OpenCL resources
-void Cleanup(cl_context context, cl_command_queue commandQueue, cl_program program, cl_kernel kernel, cl_mem memObjects[5])
+void Cleanup(cl_context context, cl_command_queue commandQueue, cl_program program, cl_kernel kernel, cl_mem memObjects[3])
 {
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		if (memObjects[i] != 0)
 			clReleaseMemObject(memObjects[i]);
@@ -272,14 +267,12 @@ void Cleanup(cl_context context, cl_command_queue commandQueue, cl_program progr
 
 long OpenCLDemo(cl_device_type type)
 {
-	array_size = ARRAY_SIZE;
-
 	cl_context context = 0;
 	cl_command_queue commandQueue = 0;
 	cl_program program = 0;
 	cl_device_id device = 0;
 	cl_kernel kernel = 0;
-	cl_mem memObjects[5] = { 0, 0, 0, 0, 0};
+	cl_mem memObjects[3] = { 0, 0, 0 };
 	cl_int errNum;
 
 	// Create an OpenCL context on first available GPU
@@ -315,87 +308,90 @@ long OpenCLDemo(cl_device_type type)
 		throw std::runtime_error("Failed to create OpenCL kernel.");
 	}
 
+	const int numMatrix1Cols = 3;
+	const int numMatrix1Rows = 2;
+	const int numMatrix2Cols = 2;
+	const int numMatrix2Rows = 3;
+
 	// Create memory objects that will be used as arguments to
 	// kernel.  First create host memory arrays that will be
 	// used to store the arguments to the kernel
-	float* matrix1row1 = new float[array_size];
-	matrix1row1[0] = 1.0f;
-	matrix1row1[1] = 2.0f;
-	matrix1row1[2] = 3.0f;
-	float* matrix1row2 = new float[array_size];
-	matrix1row2[0] = 4.0f;
-	matrix1row2[1] = 5.0f;
-	matrix1row2[2] = 6.0f;
-	float* matrix2col1 = new float[array_size];
-	matrix2col1[0] = 7.0f;
-	matrix2col1[1] = 9.0f;
-	matrix2col1[2] = 11.0f;
-	float* matrix2col2 = new float[array_size];
-	matrix2col2[0] = 8.0f;
-	matrix2col2[1] = 10.0f;
-	matrix2col2[2] = 12.0f;
-	float* finalMatrix = new float[4];
-	finalMatrix[0] = 0.0f;
-	finalMatrix[1] = 0.0f;
-	finalMatrix[2] = 0.0f;
-	finalMatrix[3] = 0.0f;
+	const int matrix1Size = numMatrix1Cols * numMatrix1Rows;
+	float* matrix1 = new float[matrix1Size];
+	float value = 1.0f;
+	for (int i = 0; i < matrix1Size; i++) {
+		matrix1[i] = value;
+		value++;
+	}
 
-	if (!CreateMemObjects(context, memObjects, matrix1row1, matrix1row2, matrix2col1, matrix2col2))
+	const int matrix2Size = numMatrix2Cols * numMatrix2Rows;
+	float* matrix2 = new float[matrix2Size];
+	for (int i = 0; i < matrix2Size; i++) {
+		matrix2[i] = value;
+		value++;
+	}
+
+	const int numFinalMatrixRows = std::min(numMatrix1Rows, numMatrix2Rows);
+	const int numFinalMatrixCols = std::min(numMatrix1Cols, numMatrix2Cols);
+	const int finalMatrixSize = numFinalMatrixRows * numFinalMatrixCols;
+	const int finalMatrixLength = sqrt(finalMatrixSize);
+
+	float* finalMatrix = new float[finalMatrixSize];
+	for (int i = 0; i < finalMatrixSize; i++) {
+		finalMatrix[i] = 0.0f;
+	}
+
+	if (!CreateMemObjects(context, memObjects, matrix1, matrix2, finalMatrix))
 	{
 		Cleanup(context, commandQueue, program, kernel, memObjects);
-		delete[] matrix1row1;
-		delete[] matrix1row2;
-		delete[] matrix2col1;
-		delete[] matrix2col2;
+		delete[] matrix1;
+		delete[] matrix2;
 		delete[] finalMatrix;
 		throw std::runtime_error("Failed to create OpenCL memory objects.");
 	}
 
-	// Set the kernel arguments (result, a, b)
-	errNum = clSetKernelArg(kernel, 0, sizeof(cl_mem), &memObjects[0]);
-	errNum |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &memObjects[1]);
-	errNum |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &memObjects[2]);
-	errNum |= clSetKernelArg(kernel, 3, sizeof(cl_mem), &memObjects[3]);
-	errNum |= clSetKernelArg(kernel, 4, sizeof(cl_mem), &memObjects[4]);
+	errNum = clSetKernelArg(kernel, 0, sizeof(cl_int), &numMatrix1Cols);
+	errNum |= clSetKernelArg(kernel, 1, sizeof(cl_int), &numMatrix1Rows);
+	errNum |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &memObjects[0]);
+	errNum |= clSetKernelArg(kernel, 3, sizeof(cl_int), &numMatrix2Cols);
+	errNum |= clSetKernelArg(kernel, 4, sizeof(cl_int), &numMatrix2Rows);
+	errNum |= clSetKernelArg(kernel, 5, sizeof(cl_mem), &memObjects[1]);
+	errNum |= clSetKernelArg(kernel, 6, sizeof(cl_int), &finalMatrixLength);
+	errNum |= clSetKernelArg(kernel, 7, sizeof(cl_mem), &memObjects[2]);
 
 	if (errNum != CL_SUCCESS)
 	{
 		Cleanup(context, commandQueue, program, kernel, memObjects);
-		delete[] matrix1row1;
-		delete[] matrix1row2;
-		delete[] matrix2col1;
-		delete[] matrix2col2;
+		delete[] matrix1;
+		delete[] matrix2;
 		delete[] finalMatrix;
 		throw std::runtime_error("Error setting kernel arguments.");
 	}
 
-	size_t globalWorkSize[1] = { static_cast<size_t>(array_size) };
-	size_t localWorkSize[1] = { 1 };
+	size_t globalWorkSize[2] = { static_cast<size_t>(numFinalMatrixCols), static_cast<size_t>(numFinalMatrixRows) };
+	size_t localWorkSize[2] = { 2,2 };
 
 	auto start = std::chrono::steady_clock::now();
 
 	// Queue the kernel up for execution across the array
-	errNum = clEnqueueNDRangeKernel(commandQueue, kernel, 1, NULL, globalWorkSize, localWorkSize, 0, NULL, NULL);
+	errNum = clEnqueueNDRangeKernel(commandQueue, kernel, 2, NULL, globalWorkSize, localWorkSize, 0, NULL, NULL);
 	if (errNum != CL_SUCCESS)
 	{
+		std::cout << "test";
 		Cleanup(context, commandQueue, program, kernel, memObjects);
-		delete[] matrix1row1;
-		delete[] matrix1row2;
-		delete[] matrix2col1;
-		delete[] matrix2col2;
+		delete[] matrix1;
+		delete[] matrix2;
 		delete[] finalMatrix;
 		throw std::runtime_error("Error queuing kernel for execution.");
 	}
 
 	// Read the output buffer back to the Host
-	errNum = clEnqueueReadBuffer(commandQueue, memObjects[4], CL_TRUE, 0, 4 * sizeof(float), finalMatrix, 0, NULL, NULL);
+	errNum = clEnqueueReadBuffer(commandQueue, memObjects[2], CL_TRUE, 0, sizeof(float) * finalMatrixSize, finalMatrix, 0, NULL, NULL);
 	if (errNum != CL_SUCCESS)
 	{
 		Cleanup(context, commandQueue, program, kernel, memObjects);
-		delete[] matrix1row1;
-		delete[] matrix1row2;
-		delete[] matrix2col1;
-		delete[] matrix2col2;
+		delete[] matrix1;
+		delete[] matrix2;
 		delete[] finalMatrix;
 		throw std::runtime_error("Error reading result buffer.");
 	}
@@ -403,18 +399,16 @@ long OpenCLDemo(cl_device_type type)
 	auto finish = std::chrono::steady_clock::now();
 
 	// Output (some of) the result buffer
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < finalMatrixSize; i++) {
 		std::cout << finalMatrix[i] << ' ';
-		if (i == 1) {
+		if (i == (finalMatrixSize / 2) - 1) {
 			std::cout << std::endl;
 		}
 	}
 
 	Cleanup(context, commandQueue, program, kernel, memObjects);
-	delete[] matrix1row1;
-	delete[] matrix1row2;
-	delete[] matrix2col1;
-	delete[] matrix2col2;
+	delete[] matrix1;
+	delete[] matrix2;
 	delete[] finalMatrix;
 
 	return std::chrono::duration_cast<std::chrono::nanoseconds>(finish - start).count();

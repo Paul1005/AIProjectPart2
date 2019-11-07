@@ -4,6 +4,7 @@
 #include "Serial.h"
 #include <chrono>
 #include <iostream>
+#include <algorithm> 
 
 /*void Serial::findShortestPath(Grid& grid) {
 
@@ -53,7 +54,7 @@
 			neighbours.push_back({ col, row + 1 });
 		}
 
-		for (std::pair<int, int> neighbour : neighbours) // go through each neighbour 
+		for (std::pair<int, int> neighbour : neighbours) // go through each neighbour
 		{
 			bool isInClosedSet = false;
 			for (std::pair<int, int> cellInClosedList : closedList) {
@@ -91,46 +92,28 @@
 		}
 	}
 }*/
-/*float** multiplyMatrices(float matrix1[2][3], float matrix2[3][2]) {
-	int const max = 3;
-	int const min = 2;
-	int const height = min;
-	int const width = min;
 
-	float** finalMatrix = new float* [height];
-
-	for (int h = 0; h < height; h++)
-	{
-		finalMatrix[h] = new float[width];
-	}
-
-	for (int i = 0; i < width; i++) {
-		for (int j = 0; j < height; j++) {
+void multiplyMatrices(const int numMatrix1Cols,
+	const int numMatrix1Rows,
+	const float* matrix1,
+	const int numMatrix2Cols,
+	const int numMatrix2Rows,
+	const float* matrix2,
+	const int finalMatrixLength,
+	float** finalMatrix)
+{
+	for (int height = 0; height < finalMatrixLength; height++) {
+		for (int width = 0; width < finalMatrixLength; width++) {
 			float value = 0.0f;
-			for (int k = 0; k < max; k++) {
-				value += (matrix1[i][k] * matrix2[k][j]);
+
+			for (int i = 0; i < numMatrix1Cols; i++) {
+				int index1 = (height * numMatrix1Cols) + i;
+				int index2 = (i * numMatrix2Cols) + width;
+				value += matrix1[index1] * matrix2[index2];
 			}
-			finalMatrix[i][j] = value;
+
+			finalMatrix[height][width] = value;
 		}
-	}
-
-	return finalMatrix;
-}*/
-
-void multiplyMatrices( const float* matrix1row1,
-	 const float* matrix1row2,
-	 const float* matrix2col1,
-	 const float* matrix2col2,
-	 float* finalMatrix) {
-
-	for (int i = 0; i < 3; i++) {
-		finalMatrix[0] += (matrix1row1[i] * matrix2col1[i]);
-
-		finalMatrix[1] += (matrix1row1[i] * matrix2col2[i]);
-
-		finalMatrix[2] += (matrix1row2[i] * matrix2col1[i]);
-
-		finalMatrix[3] += (matrix1row2[i] * matrix2col2[i]);
 	}
 }
 
@@ -165,53 +148,48 @@ long Serial::SerialDemo()
 
 	return std::chrono::duration_cast<std::chrono::nanoseconds>(finish - start).count();*/
 
-	/*float matrix1[2][3] = { {1.0f,2.0f,3.0f},{4.0f,5.0f,6.0f} };
-	float matrix2[3][2] = { {7.0f,8.0f},{9.0f,10.0f},{11.0f,12.0f} };
+	const int numMatrix1Cols = 3;
+	const int numMatrix1Rows = 2;
+	const int numMatrix2Cols = 2;
+	const int numMatrix2Rows = 3;
 
-	auto start = std::chrono::steady_clock::now();
-	float** finalMatrix = multiplyMatrices(matrix1, matrix2);
-	auto finish = std::chrono::steady_clock::now();
-
-	for (int i = 0; i < 2; i++) {
-		for (int j = 0; j < 2; j++) {
-			std::cout << finalMatrix[i][j] << ' ';
-		}
-		std::cout << std::endl;
+	const int matrix1Size = numMatrix1Cols * numMatrix1Rows;
+	float* matrix1 = new float[matrix1Size];
+	float value = 1.0f;
+	for (int i = 0; i < matrix1Size; i++) {
+		matrix1[i] = value;
+		value++;
 	}
-	return std::chrono::duration_cast<std::chrono::nanoseconds>(finish - start).count();*/
 
-	float* matrix1row1 = new float[3];
-	matrix1row1[0] = 1.0f;
-	matrix1row1[1] = 2.0f;
-	matrix1row1[2] = 3.0f;
-	float* matrix1row2 = new float[3];
-	matrix1row2[0] = 4.0f;
-	matrix1row2[1] = 5.0f;
-	matrix1row2[2] = 6.0f;
-	float* matrix2col1 = new float[3];
-	matrix2col1[0] = 7.0f;
-	matrix2col1[1] = 9.0f;
-	matrix2col1[2] = 11.0f;
-	float* matrix2col2 = new float[3];
-	matrix2col2[0] = 8.0f;
-	matrix2col2[1] = 10.0f;
-	matrix2col2[2] = 12.0f;
-	float* finalMatrix = new float[4];
-	finalMatrix[0] = 0.0f;
-	finalMatrix[1] = 0.0f;
-	finalMatrix[2] = 0.0f;
-	finalMatrix[3] = 0.0f;
+	const int matrix2Size = numMatrix2Cols * numMatrix2Rows;
+	float* matrix2 = new float[matrix2Size];
+	for (int i = 0; i < matrix2Size; i++) {
+		matrix2[i] = value;
+		value++;
+	}
+
+	const int numFinalMatrixRows = std::min(numMatrix1Rows, numMatrix2Rows);
+	const int numFinalMatrixCols = std::min(numMatrix1Cols, numMatrix2Cols);
+	const int finalMatrixSize = numFinalMatrixRows * numFinalMatrixCols;
+	const int finalMatrixLength = sqrt(finalMatrixSize);
+
+	float** finalMatrix = new float* [numFinalMatrixRows];
+	for (int i = 0; i < numFinalMatrixRows; i++)
+	{
+		finalMatrix[i] = new float[numFinalMatrixCols];
+	}
+
 
 	auto start = std::chrono::steady_clock::now();
-	multiplyMatrices(matrix1row1, matrix1row2, matrix2col1, matrix2col2, finalMatrix);
+	multiplyMatrices(numMatrix1Cols, numMatrix1Rows, matrix1, numMatrix2Cols, numMatrix2Rows, matrix2, finalMatrixLength, finalMatrix);
 	auto finish = std::chrono::steady_clock::now();
 
 	// Output (some of) the result buffer
-	for (int i = 0; i < 4; i++) {
-		std::cout << finalMatrix[i] << ' ';
-		if (i == 1) {
-			std::cout << std::endl;
+	for (int i = 0; i < numFinalMatrixRows; i++) {
+		for (int j = 0; j < numFinalMatrixCols; j++) {
+			std::cout << finalMatrix[i][j] << ' ';
 		}
+		std::cout << std::endl;
 	}
 	return std::chrono::duration_cast<std::chrono::nanoseconds>(finish - start).count();
 }
