@@ -192,5 +192,7 @@ long Serial::SerialDemo()
 		}
 		std::cout << std::endl;
 	}
+	std::cout << std::endl;
+
 	return std::chrono::duration_cast<std::chrono::nanoseconds>(finish - start).count();
 }

@@ -406,6 +406,7 @@ long OpenCLDemo(cl_device_type type)
 			std::cout << std::endl;
 		}
 	}
+	std::cout << std::endl;
 
 	Cleanup(context, commandQueue, program, kernel, memObjects);
 	delete[] matrix1;

@@ -4,10 +4,13 @@
 
 int main(int argc, char** argv)
 {
+	long serialRunTime;
+	long openCLCPURunTime, openCLGPURunTime, openCLCPUGPURunTime;
 	try
 	{
 		std::cout << "Running algorithm serially..." << std::endl;
-		std::cout << "Serially ran in " << Serial::SerialDemo() << " nanoseconds" << std::endl << std::endl;
+		serialRunTime = Serial::SerialDemo();
+		std::cout << "Serially ran in " << serialRunTime << " nanoseconds" << std::endl << std::endl;
 	}
 	catch (std::runtime_error ex)
 	{
@@ -17,7 +20,8 @@ int main(int argc, char** argv)
 	try
 	{
 		std::cout << "Running algorithm on OpenCL CPU..." << std::endl;
-		std::cout << "OpenCL ran in " << OpenCLDemo(CL_DEVICE_TYPE_CPU) << " nanoseconds" << std::endl << std::endl;
+		openCLCPURunTime = OpenCLDemo(CL_DEVICE_TYPE_CPU);
+		std::cout << "OpenCL ran in " << openCLCPURunTime << " nanoseconds" << std::endl << std::endl;
 	}
 	catch (std::runtime_error ex)
 	{
@@ -27,7 +31,8 @@ int main(int argc, char** argv)
 	try
 	{
 		std::cout << "Running algorithm on OpenCL GPU..." << std::endl;
-		std::cout << "OpenCL ran in " << OpenCLDemo(CL_DEVICE_TYPE_GPU) << " nanoseconds" << std::endl << std::endl;
+		openCLGPURunTime = OpenCLDemo(CL_DEVICE_TYPE_GPU);
+		std::cout << "OpenCL ran in " << openCLGPURunTime << " nanoseconds" << std::endl << std::endl;
 	}
 	catch (std::runtime_error ex)
 	{
@@ -37,7 +42,8 @@ int main(int argc, char** argv)
 	try
 	{
 		std::cout << "Running algorithm on OpenCL CPU+GPU..." << std::endl;
-		std::cout << "OpenCL ran in " << OpenCLDemo(CL_DEVICE_TYPE_CPU|CL_DEVICE_TYPE_GPU) << " nanoseconds" << std::endl << std::endl;
+		openCLCPUGPURunTime = OpenCLDemo(CL_DEVICE_TYPE_CPU | CL_DEVICE_TYPE_GPU);
+		std::cout << "OpenCL ran in " << openCLCPUGPURunTime << " nanoseconds" << std::endl << std::endl;
 	}
 	catch (std::runtime_error ex)
 	{
