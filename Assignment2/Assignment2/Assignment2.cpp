@@ -100,7 +100,7 @@ void printArea() {
 		}
 		cout << '\n';
 	}
-	goToXY(0, 0);
+	cout << "Number of player moves: " << numOfPlayerMoves << '\n';
 }
 
 void createPath(pair<int, int> finalCell) {
@@ -210,6 +210,7 @@ void startGame() {
 	while (gameIsRunning) {
 		grid[currentPosition.first][currentPosition.second].symbol = 'P';
 		printArea();
+		goToXY(0, 0);
 		if (GetKeyState('W') & 0x8000)
 		{ 
 			if (grid[currentPosition.first][currentPosition.second - 1].symbol != '#'){
@@ -242,6 +243,8 @@ void startGame() {
 		if (currentPosition.first == endX && currentPosition.second == endY) {
 			gameIsRunning = false;
 		}
+
+		Sleep(125);
 	}
 }
 
@@ -250,6 +253,9 @@ int main()
 	createArea();
 	startGame();
 	findShortestPath();
+	printArea();
+
+	cout << "Number of AI moves: " << numOfAIMoves << '\n';
 
 	if (numOfAIMoves > numOfPlayerMoves) {
 		cout << "You Win";
@@ -260,6 +266,4 @@ int main()
 	else if (numOfAIMoves == numOfPlayerMoves) {
 		cout << "A Draw";
 	}
-
-	printArea();
 }
