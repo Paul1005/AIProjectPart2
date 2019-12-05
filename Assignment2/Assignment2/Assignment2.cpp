@@ -213,28 +213,28 @@ void startGame() {
 		goToXY(0, 0);
 		if (GetKeyState('W') & 0x8000)
 		{ 
-			if (grid[currentPosition.first][currentPosition.second - 1].symbol != '#'){
+			if (currentPosition.second > 0 && grid[currentPosition.first][currentPosition.second - 1].symbol != '#' ){
 				numOfPlayerMoves++;
 				currentPosition = { currentPosition.first, currentPosition.second - 1 };
 			}
 		}
 		else if (GetKeyState('A') & 0x8000)
 		{
-			if (grid[currentPosition.first - 1][currentPosition.second].symbol != '#') {
+			if (currentPosition.first > 0 && grid[currentPosition.first - 1][currentPosition.second].symbol != '#') {
 				numOfPlayerMoves++;
 				currentPosition = { currentPosition.first - 1, currentPosition.second };
 			}
 		}
 		else if (GetKeyState('S') & 0x8000)
 		{
-			if (grid[currentPosition.first][currentPosition.second + 1].symbol != '#') {
+			if (currentPosition.second < y - 1 && grid[currentPosition.first][currentPosition.second + 1].symbol != '#') {
 				numOfPlayerMoves++;
 				currentPosition = { currentPosition.first, currentPosition.second + 1 };
 			}
 		}
 		else if (GetKeyState('D') & 0x8000)
 		{
-			if (grid[currentPosition.first + 1][currentPosition.second].symbol != '#') {
+			if (currentPosition.first < x - 1 && grid[currentPosition.first + 1][currentPosition.second].symbol != '#') {
 				numOfPlayerMoves++;
 				currentPosition = { currentPosition.first + 1, currentPosition.second };
 			}
