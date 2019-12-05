@@ -8,6 +8,7 @@
 #include <vector>
 #include <cmath>    
 #include <limits.h>
+#include <Windows.h>
 
 using namespace std;
 
@@ -30,6 +31,9 @@ int const startX = 0;
 int const startY = 2;
 int const endX = 12;
 int const endY = 7;
+
+int numOfPlayerMoves = 0;
+int numOfAIMoves = 0;
 
 void generateGrid() {
 	for (int i = 0; i < y; i++) {
@@ -80,6 +84,7 @@ void createPath(pair<int, int> finalCell) {
 	Cell* cellPointer = grid[finalCell.first][finalCell.second].parent;
 	Cell cell = *cellPointer;
 	while (cell.col != startX || cell.row != startY) {
+		numOfAIMoves++;
 		grid[cell.col][cell.row].symbol = '+';
 		cellPointer = cell.parent;
 		cell = *cellPointer;
@@ -176,11 +181,54 @@ void findShortestPath() {
 	}
 }
 
+void startGame() {
+	pair<int, int> currentPosition = { startX, startY };
+	bool gameIsRunning = true;
+
+	while (gameIsRunning) {
+		printArea();
+		if (GetKeyState('W') & 0x8000)
+		{
+			numOfPlayerMoves++;
+			currentPosition = { currentPosition.first, currentPosition.second + 1 };
+		}
+		else if (GetKeyState('A') & 0x8000)
+		{
+			numOfPlayerMoves++;
+			currentPosition = { currentPosition.first - 1, currentPosition.second};
+		}
+		else if (GetKeyState('S') & 0x8000)
+		{
+			numOfPlayerMoves++;
+			currentPosition = { currentPosition.first, currentPosition.second - 1 };
+		}
+		else if (GetKeyState('D') & 0x8000)
+		{
+			numOfPlayerMoves++;
+			currentPosition = { currentPosition.first + 1, currentPosition.second };
+		}
+
+		if (currentPosition.first == endX && currentPosition.second == endY) {
+			gameIsRunning = false;
+		}
+	}
+}
+
 int main()
 {
 	createArea();
-
+	startGame();
 	findShortestPath();
+
+	if (numOfAIMoves > numOfPlayerMoves) {
+		cout << "You Win";
+	}
+	else if (numOfAIMoves < numOfPlayerMoves) {
+		cout << "You Lose";
+	}
+	else if (numOfAIMoves == numOfPlayerMoves) {
+		cout << "A Draw";
+	}
 
 	printArea();
 }
