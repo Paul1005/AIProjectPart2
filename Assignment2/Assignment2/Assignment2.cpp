@@ -186,26 +186,35 @@ void startGame() {
 	bool gameIsRunning = true;
 
 	while (gameIsRunning) {
+		grid[currentPosition.first][currentPosition.second].symbol = 'P';
 		printArea();
 		if (GetKeyState('W') & 0x8000)
-		{
-			numOfPlayerMoves++;
-			currentPosition = { currentPosition.first, currentPosition.second + 1 };
+		{ 
+			if (grid[currentPosition.first][currentPosition.second - 1].symbol != '#'){
+				numOfPlayerMoves++;
+				currentPosition = { currentPosition.first, currentPosition.second - 1 };
+			}
 		}
 		else if (GetKeyState('A') & 0x8000)
 		{
-			numOfPlayerMoves++;
-			currentPosition = { currentPosition.first - 1, currentPosition.second};
+			if (grid[currentPosition.first - 1][currentPosition.second].symbol != '#') {
+				numOfPlayerMoves++;
+				currentPosition = { currentPosition.first - 1, currentPosition.second };
+			}
 		}
 		else if (GetKeyState('S') & 0x8000)
 		{
-			numOfPlayerMoves++;
-			currentPosition = { currentPosition.first, currentPosition.second - 1 };
+			if (grid[currentPosition.first][currentPosition.second + 1].symbol != '#') {
+				numOfPlayerMoves++;
+				currentPosition = { currentPosition.first, currentPosition.second + 1 };
+			}
 		}
 		else if (GetKeyState('D') & 0x8000)
 		{
-			numOfPlayerMoves++;
-			currentPosition = { currentPosition.first + 1, currentPosition.second };
+			if (grid[currentPosition.first + 1][currentPosition.second].symbol != '#') {
+				numOfPlayerMoves++;
+				currentPosition = { currentPosition.first + 1, currentPosition.second };
+			}
 		}
 
 		if (currentPosition.first == endX && currentPosition.second == endY) {
