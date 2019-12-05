@@ -34,6 +34,7 @@ int const endY = 7;
 
 int numOfPlayerMoves = 0;
 int numOfAIMoves = 0;
+bool gameIsRunning = true;
 
 void generateGrid() {
 	for (int i = 0; i < y; i++) {
@@ -71,6 +72,27 @@ void createArea() {
 	createEndPoint();
 }
 
+/*
+taken from https://stackoverflow.com/questions/15770853/how-to-use-setconsolecursorposition-func
+*/
+void goToXY(int column, int line)
+{
+	// Create a COORD structure and fill in its members.
+	// This specifies the new position of the cursor that we will set.
+	COORD coord;
+	coord.X = column;
+	coord.Y = line;
+
+	// Obtain a handle to the console screen buffer.
+	// (You're just using the standard console, so you can use STD_OUTPUT_HANDLE
+	// in conjunction with the GetStdHandle() to retrieve the handle.)
+	// Note that because it is a standard handle, we don't need to close it.
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+
+	// Finally, call the SetConsoleCursorPosition function.
+	SetConsoleCursorPosition(hConsole, coord);
+}
+
 void printArea() {
 	for (int i = 0; i < y; i++) {
 		for (int j = 0; j < x; j++) {
@@ -78,6 +100,7 @@ void printArea() {
 		}
 		cout << '\n';
 	}
+	goToXY(0, 0);
 }
 
 void createPath(pair<int, int> finalCell) {
@@ -183,7 +206,6 @@ void findShortestPath() {
 
 void startGame() {
 	pair<int, int> currentPosition = { startX, startY };
-	bool gameIsRunning = true;
 
 	while (gameIsRunning) {
 		grid[currentPosition.first][currentPosition.second].symbol = 'P';
