@@ -112,6 +112,7 @@ void createPath(pair<int, int> finalCell) {
 		cellPointer = cell.parent;
 		cell = *cellPointer;
 	}
+	numOfAIMoves++;
 }
 
 int heuristic(Cell startCell, Cell endCell) {
@@ -257,13 +258,10 @@ int main()
 
 	cout << "Number of AI moves: " << numOfAIMoves << '\n';
 
-	if (numOfAIMoves > numOfPlayerMoves) {
+	if (numOfAIMoves >= numOfPlayerMoves) {
 		cout << "You Win";
 	}
 	else if (numOfAIMoves < numOfPlayerMoves) {
 		cout << "You Lose";
-	}
-	else if (numOfAIMoves == numOfPlayerMoves) {
-		cout << "A Draw";
 	}
 }
